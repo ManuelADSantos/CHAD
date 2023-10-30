@@ -147,7 +147,7 @@ void writePPM(const char *filename, PPMImage *img)
 
 int main(int argc, char *argv[])
 {
-    int height = 5184, width = 3456;
+    // int height = 5184, width = 3456;
     int err;
 
     if (argc == 2)
@@ -155,6 +155,8 @@ int main(int argc, char *argv[])
         PPMImage *image, *gs_image;
         PPMPixel *d_image_data, *d_gs_image_data;
         image = readPPM(argv[1]);
+
+        int height = image->x, width = image->y;
 
         // for (int i = 0; i < 20; i++)
         // {
@@ -205,6 +207,7 @@ int main(int argc, char *argv[])
         // ===== Get initial time
         clock_gettime(CLOCK_MONOTONIC, &start);
         colorToGreyScaleConvertion<<<ceil(width / 32.0), ceil(height / 32.0)>>>(d_gs_image_data, d_image_data, width, height);
+        cudaDeviceSynchronize();
         
         // ===== Copy the result back to the host
         err = cudaMemcpy(gs_image->data, d_gs_image_data, sizeof(PPMPixel) * image->x * image->y, cudaMemcpyDeviceToHost);
