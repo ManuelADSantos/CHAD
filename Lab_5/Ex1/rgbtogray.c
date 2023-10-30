@@ -168,6 +168,10 @@ int main(int argc, char *argv[])
         free(image->data);
         free(image);
     }
+    else
+    {
+        printf("Usage: ./rgbtogray <input_file>\n");
+    }
 
     return 0;
 }
