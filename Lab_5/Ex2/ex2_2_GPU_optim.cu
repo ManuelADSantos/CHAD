@@ -1,25 +1,26 @@
-// nvcc -o ex2_1_GPU_optim ex2_1_GPU_optim.cu -lrt -lm
+// nvcc -o ex2_2_GPU_optim ex2_2_GPU_optim.cu -lrt -lm
 #include <stdio.h>
 
 #define N 10
 
 __global__ void sum(int *a, int *result) {
-    int tid = threadIdx.x;
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    __shared__ int sdata[N];
+    __shared__ int temp[N];
 
-    sdata[tid] = a[idx];
+    int tid = threadIdx.x;
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+    temp[tid] = a[i];
     __syncthreads();
 
-    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
-        if (tid < s) {
-            sdata[tid] += sdata[tid + s];
+    for (int s = 1; s < blockDim.x; s *= 2) {
+        if (tid % (2 * s) == 0) {
+            temp[tid] += temp[tid + s];
         }
         __syncthreads();
     }
 
     if (tid == 0) {
-        result[blockIdx.x] = sdata[0];
+        *result = temp[0];
     }
 }
 

@@ -3,25 +3,29 @@
 
 #define N 10
 
-__global__ void sum(int *a, int *result) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-    __syncthreads();
-    if (idx < N) {
-        result[blockIdx.x] = a[idx];
-    }
+__global__ void sum(int *a, int *result)
+{
+    int index = threadIdx.x + blockIdx.x * blockDim.x;
+    
+    atomicAdd(result, a[index]);
 }
 
-int main() {
-    int *a, *result, *d_a, *d_result;
+int main()
+{
+    int *a, *result;
+    int *d_a, *d_result;
     int size = N * sizeof(int);
 
     a = (int*)malloc(size);
     result = (int*)calloc(1, sizeof(int));
+    *result = 0;
 
-    for (int i = 0; i < N; i++) {
+    printf("result = %d\n", *result);
+    for (int i = 0; i < N; i++) 
+    {
         a[i] = i;
-        printf("a[%d] = %d | result[%d] = %d\n",i, a[i], i, result[i]);
+        printf("a[%d] = %d  ",i, a[i]);
     }
 
     cudaMalloc((void**)&d_a, size);
@@ -36,7 +40,7 @@ int main() {
 
     cudaMemcpy(result, d_result, sizeof(int), cudaMemcpyDeviceToHost);
 
-    printf("Sum of all elements in the vector: %d\n", *result);
+    printf("\nSum of all elements in the vector: %d\n", *result);
 
     cudaFree(d_a);
     cudaFree(d_result);
