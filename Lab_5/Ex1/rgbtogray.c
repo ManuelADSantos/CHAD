@@ -1,5 +1,4 @@
 // gcc -o rgbtogray rgbtogray.c -lm -lrt
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

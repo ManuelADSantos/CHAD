@@ -1,5 +1,4 @@
 // nvcc -o rgbtogray_cuda rgbtogray_cuda.cu -lrt -lm
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -231,7 +230,7 @@ int main(int argc, char *argv[])
 
         writePPM("output_GPU.ppm", gs_image);
 
-        writePPM("output_GPU_original.ppm", image);
+        //writePPM("output_GPU_original.ppm", image);
 
         free(gs_image->data);
         free(gs_image);
