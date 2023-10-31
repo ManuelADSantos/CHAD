@@ -226,7 +226,7 @@ int main(int argc, char *argv[])
         
         for (int i = 0; i < 10; i++)
         {
-            printf("Pixel %d: %d %d %d\n", i, gs_image->data[i].red, gs_image->data[i].green, gs_image->data[i].blue);
+            printf("Pixel %d: %X %X %d\n", i, gs_image->data[i].red, gs_image->data[i].green, gs_image->data[i].blue);
         }
 
         writePPM("output_GPU.ppm", gs_image);
