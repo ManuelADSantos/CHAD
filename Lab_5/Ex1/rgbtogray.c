@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
         double finalTime = (end.tv_sec * 1e3) + (end.tv_nsec * 1e-6);
         printf("-> CPU Execution Time:\t%f ms\n", (finalTime - initialTime));
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 20; i++)
         {
             printf("Pixel %d: %d %d %d\n", i, gs_image->data[i].red, gs_image->data[i].green, gs_image->data[i].blue);
         }
