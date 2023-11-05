@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     int vector[N];
     int sum = 0;
 
-    // ===== Initialize timer variables
+    // ===== Declare timer variables
     struct timespec start, end;
 
     // ===== Initialize the vector
