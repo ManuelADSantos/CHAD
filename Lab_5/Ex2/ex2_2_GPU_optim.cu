@@ -1,17 +1,25 @@
+// ============================================================================
+// Programmer: Manuel Santos 2019231352
+// Date: 03/11/2023
+// ============================================================================
+// -> Compile
 // nvcc -o ex2_2_GPU_optim ex2_2_GPU_optim.cu -lrt -lm
+// -> Run
+// ./ex2_2_GPU_optim num_elements
+// ============================================================================
 #include <stdio.h>
 #include <time.h>
 
-#define N 10000
-
-__global__ void sum(int *a, int *result)
+// ===================== Kernel function =====================
+__global__ void sum(int *a, int *result, int n)
 {
-    __shared__ int temp[N];
+    extern __shared__ int temp[];
 
     int tid = threadIdx.x;
     int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-    temp[tid] = a[i];
+    // Initialize temp array with input or 0 if out of bounds
+    temp[tid] = (i < n) ? a[i] : 0;
     __syncthreads();
 
     for (int s = blockDim.x / 2; s > 0; s >>= 1) {
@@ -23,20 +31,21 @@ __global__ void sum(int *a, int *result)
     }
 
     if (tid == 0) {
-        *result = temp[0];
+        atomicAdd(result, temp[0]);
     }
 }
 
+// ===================== Main function =====================
 int main(int argc, char *argv[])
 {
     // Check if the number of arguments is correct
-    // if (argc != 2)
-    // {
-    //     printf("./ex2_CPU num_elements\n");
-    //     return -1;
-    // }
-    //int N = atoi(argv[1]);
-    printf("Number of elements: %d\n", N);
+    if (argc != 2)
+    {
+        printf("./ex2_2_GPU_optim num_elements\n");
+        return -1;
+    }
+    int N = atoi(argv[1]);
+    printf("-> Number of elements:  %d\n", N);
 
     int *a, *result, *d_a, *d_result;
     int size = N * sizeof(int);
@@ -59,11 +68,12 @@ int main(int argc, char *argv[])
 
     int threadsPerBlock = 256;
     int blocksPerGrid = ceil(N/256.0);
+    int sharedMemorySize = N * sizeof(int);
 
     // ===== Get initial time
     clock_gettime(CLOCK_MONOTONIC, &start);
 
-    sum<<<blocksPerGrid, threadsPerBlock>>>(d_a, d_result);
+    sum<<<blocksPerGrid, threadsPerBlock, sharedMemorySize>>>(d_a, d_result, N);
 
     cudaMemcpy(result, d_result, sizeof(int), cudaMemcpyDeviceToHost);
 

@@ -23,7 +23,7 @@ __global__ void reduce(int *g_idata, int *g_odata)
 
 int main()
 {
-    //inicialização do vetor
+    //inicializaï¿½ï¿½o do vetor
     int aux[N];
     int final = 0;
     for (int i=0; i<N; i++)
