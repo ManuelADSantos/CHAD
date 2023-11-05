@@ -5,7 +5,7 @@
 // -> Compile
 // gcc -o ex2_CPU ex2_CPU.c -lm -lrt
 // -> Run
-// ./ex2_CPU num_elements
+// ./ex2_CPU
 // ============================================================================
 #include <stdio.h>
 #include <stdlib.h>

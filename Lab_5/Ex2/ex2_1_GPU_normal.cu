@@ -5,7 +5,7 @@
 // -> Compile
 // nvcc -o ex2_1_GPU_normal ex2_1_GPU_normal.cu -lrt -lm
 // -> Run
-// ./ex2_1_GPU_normal num_elements
+// ./ex2_1_GPU_normal
 // ============================================================================
 #include <stdio.h>
 #include <stdlib.h>

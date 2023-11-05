@@ -5,35 +5,36 @@
 // -> Compile
 // nvcc -o ex2_2_GPU_optim ex2_2_GPU_optim.cu -lrt -lm
 // -> Run
-// ./ex2_2_GPU_optim num_elements
+// ./ex2_2_GPU_optim
 // ============================================================================
 #include <stdio.h>
 #include <time.h>
 
 // ===================== Kernel function =====================
-__global__ void sum(int *a, int *result, int n)
-{
-    extern __shared__ int temp[];
-
+__global__ void sum(int* input, int* output, int N) {
+    __shared__ int soma[N]; // Allocate shared memory
     int tid = threadIdx.x;
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int index = threadIdx.x + (blockIdx.x * blockDim.x);
 
-    // Initialize temp array with input or 0 if out of bounds
-    temp[tid] = (i < n) ? a[i] : 0;
+    // Load elements into shared memory
+    soma[tid] = v1[index];
     __syncthreads();
-
-    for (int s = blockDim.x / 2; s > 0; s >>= 1) {
-        if (tid < s) 
-        {
-            temp[tid] += temp[tid + s];
-        }
-        __syncthreads();
+        
+    // Reduction in shared memory
+    for (int s = 1; s < blockDim.x; s *= 2) {
+	if (tid % (2*s) == 0) {
+	    soma[tid] += soma[tid + s];
+		
+	}
+	__syncthreads();
     }
 
-    if (tid == 0) {
-        atomicAdd(result, temp[0]);
+    // Result in global memory
+    if(tid == 0){
+	result[blockIdx.x] = soma[tid];
     }
 }
+
 
 // ===================== Main function =====================
 int main(int argc, char *argv[])
