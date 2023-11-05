@@ -2,10 +2,9 @@
 #include <stdio.h>
 #include <time.h>
 
-#define N 10000
+#define N 100
 
-__global__ void sum(int *a, int *result)
-{
+__global__ void sum(int *a, int *result) {
     __shared__ int temp[N];
 
     int tid = threadIdx.x;
@@ -14,8 +13,8 @@ __global__ void sum(int *a, int *result)
     temp[tid] = a[i];
     __syncthreads();
 
-    for (int s = blockDim.x / 2; s > 0; s >>= 1) {
-        if (tid < s) 
+    for (int s = 1; s < blockDim.x; s *= 2) {
+        if (tid % (2 * s) == 0) 
         {
             temp[tid] += temp[tid + s];
         }
@@ -27,17 +26,8 @@ __global__ void sum(int *a, int *result)
     }
 }
 
-int main(int argc, char *argv[])
+int main()
 {
-    // Check if the number of arguments is correct
-    // if (argc != 2)
-    // {
-    //     printf("./ex2_CPU num_elements\n");
-    //     return -1;
-    // }
-    //int N = atoi(argv[1]);
-    printf("Number of elements: %d\n", N);
-
     int *a, *result, *d_a, *d_result;
     int size = N * sizeof(int);
 
@@ -47,8 +37,7 @@ int main(int argc, char *argv[])
     a = (int*)malloc(size);
     result = (int*)malloc(sizeof(int));
 
-    for (int i = 0; i < N; i++)
-    {
+    for (int i = 0; i < N; i++) {
         a[i] = i;
     }
 
@@ -57,13 +46,13 @@ int main(int argc, char *argv[])
 
     cudaMemcpy(d_a, a, size, cudaMemcpyHostToDevice);
 
-    int threadsPerBlock = 256;
-    int blocksPerGrid = ceil(N/256.0);
+    dim3 dimBlock(N, 1, 1);
+    dim3 dimGrid(1, 1, 1);
 
     // ===== Get initial time
     clock_gettime(CLOCK_MONOTONIC, &start);
 
-    sum<<<blocksPerGrid, threadsPerBlock>>>(d_a, d_result);
+    sum<<<dimGrid, dimBlock>>>(d_a, d_result);
 
     cudaMemcpy(result, d_result, sizeof(int), cudaMemcpyDeviceToHost);
 
