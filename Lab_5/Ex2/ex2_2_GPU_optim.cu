@@ -1,53 +1,32 @@
-// ============================================================================
-// Programmer: Manuel Santos 2019231352
-// Date: 03/11/2023
-// ============================================================================
-// -> Compile
 // nvcc -o ex2_2_GPU_optim ex2_2_GPU_optim.cu -lrt -lm
-// -> Run
-// ./ex2_2_GPU_optim
-// ============================================================================
 #include <stdio.h>
 #include <time.h>
 
-#define N 10000
+#define N 100
 
-__global__ void sum(int *a, int *result)
-{
+__global__ void sum(int *a, int *result) {
     __shared__ int temp[N];
 
     int tid = threadIdx.x;
-    int index = threadIdx.x + (blockIdx.x * blockDim.x);
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-    // Load elements into shared memory
-    soma[tid] = v1[index];
+    temp[tid] = a[i];
     __syncthreads();
 
-    for (int s = blockDim.x / 2; s > 0; s >>= 1) {
-        if (tid < s) 
+    for (int s = 1; s < blockDim.x; s *= 2) {
+        if (tid % (2 * s) == 0) 
         {
             temp[tid] += temp[tid + s];
         }
         __syncthreads();
     }
 
-    // Result in global memory
-    if(tid == 0){
-	result[blockIdx.x] = soma[tid];
+    if (tid == 0) {
+        *result = temp[0];
     }
 }
 
-int main(int argc, char *argv[])
-{
-    // Check if the number of arguments is correct
-    // if (argc != 2)
-    // {
-    //     printf("./ex2_CPU num_elements\n");
-    //     return -1;
-    // }
-    //int N = atoi(argv[1]);
-    printf("Number of elements: %d\n", N);
-
+int main() {
     int *a, *result, *d_a, *d_result;
     int size = N * sizeof(int);
 
@@ -66,13 +45,13 @@ int main(int argc, char *argv[])
 
     cudaMemcpy(d_a, a, size, cudaMemcpyHostToDevice);
 
-    int threadsPerBlock = 256;
-    int blocksPerGrid = ceil(N/256.0);
+    dim3 dimBlock(N, 1, 1);
+    dim3 dimGrid(1, 1, 1);
 
     // ===== Get initial time
     clock_gettime(CLOCK_MONOTONIC, &start);
 
-    sum<<<blocksPerGrid, threadsPerBlock>>>(d_a, d_result);
+    sum<<<dimGrid, dimBlock>>>(d_a, d_result);
 
     cudaMemcpy(result, d_result, sizeof(int), cudaMemcpyDeviceToHost);
 
