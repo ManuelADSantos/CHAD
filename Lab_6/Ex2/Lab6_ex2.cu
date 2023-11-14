@@ -18,7 +18,7 @@ __global__ void get_pi(unsigned long long int *count_circle, unsigned long long 
     curandState state;
     curand_init(seed, idx, 0, &state);
 
-    for(int i = 0; i < 1000; i++)
+    for(int i = 0; i < 100000; i++)
     {
         float x = curand_uniform(&state)*2.0 - 1.0;
         float y = curand_uniform(&state)*2.0 - 1.0;
