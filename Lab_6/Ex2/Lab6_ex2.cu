@@ -44,14 +44,14 @@ int main(int argc, char *argv[])
     cudaMemcpy(square_device, &square_host, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
 
     int threadsPerBlock = 256;
-    int blocksPerGrid = 256;
+    int blocksPerGrid = 1024;
 
     get_pi<<<blocksPerGrid, threadsPerBlock>>>(circle_device, square_device, time_host);
 
     cudaMemcpy(&circle_host, circle_device, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
     cudaMemcpy(&square_host, square_device, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
 
-    printf("Pi = %.10g\n", (double)(4.0*circle_host/(double)(circle_host+square_host)));
+    printf("Pi = %.10lf\n", (double)(4.0*circle_host/(double)(circle_host+square_host)));
     printf("Points: Circle = %llu || Square = %llu\n", circle_host, square_host);
 
     cudaFree(circle_device);
