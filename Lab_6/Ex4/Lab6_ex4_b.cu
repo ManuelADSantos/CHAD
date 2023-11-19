@@ -3,7 +3,7 @@
 // Date: 07/11/2023
 // ============================================================================
 // -> Compile
-// nvcc -o Lab6_ex2 Lab6_ex2.cu -lrt
+// nvcc -o Lab6_ex4_b Lab6_ex4_b.cu -lrt
 // ============================================================================
 
 #include <stdio.h>
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     cudaMemcpy(square_device, &square_host, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
 
     int threadsPerBlock = 256;
-    int blocksPerGrid = 1024;
+    int blocksPerGrid = 256;
 
     get_pi<<<blocksPerGrid, threadsPerBlock>>>(circle_device, square_device, time_host);
 
