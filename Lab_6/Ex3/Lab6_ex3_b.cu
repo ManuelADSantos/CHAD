@@ -11,49 +11,69 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "lib/stb_image.h"
 #include "lib/stb_image_write.h"
-
-#define R 0
-#define G 1
-#define B 2
+#include <stdio.h>
+#include <stdlib.h>
 
 // ===== Kernel Properties
-#define BLUR_SIZE 16
-#define TILE_DIM 16
-#define BLOCK_SIZE 16
-
+#define BLUR_SIZE 5
 
 // ======================================== KERNEL ========================================
-__global__ void blurKernel_shared(unsigned char* in, unsigned char* out, int width, int height, int num_channel, int channel)
-{
-    __shared__ unsigned char tile[BLOCK_SIZE*BLOCK_SIZE];
-    int col = blockIdx.x * TILE_DIM + threadIdx.x;
-    int row = blockIdx.y * TILE_DIM + threadIdx.y;
-    int pixSum;
-    int numPixels;
+// ======================================== KERNEL ========================================
+__global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int height, int num_channel) 
+{   
+    // ===== Pixel Variables
+    int pixSum, numPixels;
 
-    if(col > -1 && col < width && row > -1 && row < height )
+    // ===== Global Pixel Position
+    int col_global = blockIdx.x * blockDim.x + threadIdx.x;
+    int row_global = blockIdx.y * blockDim.y + threadIdx.y;
+
+    // ===== Check if pixel is inside image
+    if(col_global > -1 && col_global < width && row_global > -1 && row_global < height ) 
     {
-        pixSum = 0;
-        numPixels = 0;
-        tile[row*width*num_channel + col*num_channel] = in[row*width*num_channel + col*num_channel];
-        __syncthreads();
-        for(int blurRow = -BLUR_SIZE; blurRow < BLUR_SIZE + 1; ++blurRow)
+        // ===== Iterate over all color channels
+        for(int channel = 0; channel < num_channel; channel++)
         {
-            for(int blurCol = -BLUR_SIZE; blurCol < BLUR_SIZE + 1; ++blurCol)
+            // ===== Shared Memory
+            __shared__ unsigned char tile[BLUR_SIZE*BLUR_SIZE];
+
+            // ===== Local Pixel Position
+            int col_local = 0, row_local = 0;
+
+            for(int i = -BLUR_SIZE/2; i <= BLUR_SIZE/2; i++)
             {
-                int curRow = row + blurRow;
-                int curCol = col + blurCol;
-                if(curRow > -1 && curRow < height && curCol > -1 && curCol < width)
+                for(int j = -BLUR_SIZE/2; j <= BLUR_SIZE/2; j++)
                 {
-                    pixSum += tile[curRow * width * num_channel + curCol * num_channel + channel];
+                    tile[row_local * BLUR_SIZE + col_local] = in[(row_global + i) * width * num_channel + (col_global + j) * num_channel + channel];
+                    col_local++;
+                }
+                row_local++;
+            }
+
+            // ===== Wait for all threads to finish copying to shared memory
+            __syncthreads();
+
+            // ===== Calculate Pixel Sum
+            pixSum = 0;
+            numPixels = 0;
+            for(int i = 0; i < BLUR_SIZE; i++)
+            {
+                for(int j = 0; j < BLUR_SIZE; j++)
+                {
+                    pixSum += tile[i * BLUR_SIZE + j];
                     numPixels++;
-                    __syncthreads();
                 }
             }
+
+            // ===== Calculate Pixel Average
+            out[row_global * width * num_channel + col_global * num_channel + channel] = (unsigned char)(pixSum / numPixels);
+
+            // ===== Wait for all threads to finish copying to global memory
+            __syncthreads();
         }
-        out[row * width * num_channel + col * num_channel + channel] = (unsigned char)(pixSum/numPixels);
     }
 }
+
 
 // ======================================== MAIN ========================================
 int main(int argc, char *argv[])
@@ -68,11 +88,11 @@ int main(int argc, char *argv[])
 
     // ===== Load Original Image
     unsigned char *image = stbi_load(img_name,&width,&height,&n,0);
-
+    
     // ===== Allocate Memory for Blurred Image
     unsigned char *output = (unsigned char*)malloc(width * height * n *sizeof(unsigned char));
-
-    // ===== Allocate Memory for Device Image
+    
+    // ===== Allocate Device Memory
     unsigned char* Dev_Input_Image = NULL;
     unsigned char* Dev_Output_Image = NULL;
     cudaMalloc((void**)&Dev_Input_Image, sizeof(unsigned char)* height * width * n);
@@ -82,22 +102,19 @@ int main(int argc, char *argv[])
     cudaMemcpy(Dev_Input_Image, image, sizeof(unsigned char) * height * width * n, cudaMemcpyHostToDevice);
     
     // ===== Kernel Dimensions
-    dim3 blockSize(BLOCK_SIZE, BLOCK_SIZE);
-    dim3 gridSize(width/blockSize.x+1, height/blockSize.y+1);
-    
+    dim3 blockSize(16, 16);
+    dim3 gridSize((width + blockSize.x - 1) / blockSize.x, (height + blockSize.y - 1) / blockSize.y);
+
     // ===== Start Time
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
-        
+    
     // ===== Kernel Call
-    blurKernel_shared <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height, n, 0);
-    blurKernel_shared <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height,n,1);
-    blurKernel_shared <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height,n,2);
-    cudaDeviceSynchronize(); // we need this so the kernel is guaranteed to finish (and the output from the kernel will find a waiting standard output queue), before the application is allowed to exit
+    blurKernel <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height, n);
     
     // ===== End Time
     clock_gettime(CLOCK_MONOTONIC, &end);
-    
+
     // ===== Copy Device Image to Host Image
     cudaMemcpy(image, Dev_Output_Image, sizeof(unsigned char) * height * width * n, cudaMemcpyDeviceToHost);
     
@@ -109,7 +126,7 @@ int main(int argc, char *argv[])
     double initialTime=(start.tv_sec*1e3)+(start.tv_nsec*1e-6);
     double finalTime=(end.tv_sec*1e3)+(end.tv_nsec*1e-6);
     printf("Time of execution: %f ms\n", (finalTime - initialTime));
-
+    
     // ===== Free Device Memory
     cudaFree(Dev_Input_Image);
     cudaFree(Dev_Output_Image);

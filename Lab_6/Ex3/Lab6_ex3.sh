@@ -21,7 +21,7 @@ nvcc -o Lab6_ex3_a Lab6_ex3_a.cu -lrt
 for ((img=1; img<=$num_imgs; img++))
 do
     echo "-- Image $img"
-    # ./Lab6_ex3_a "$img"
+    ./Lab6_ex3_a "$img"
 done
 rm Lab6_ex3_a
 

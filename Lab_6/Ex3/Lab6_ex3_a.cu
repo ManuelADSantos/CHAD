@@ -11,12 +11,11 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "lib/stb_image.h"
 #include "lib/stb_image_write.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 // ===== Kernel Properties
-#define BLUR_SIZE 4
-#define TILE_DIM 16
-#define BLOCK_SIZE 16
-
+#define BLUR_SIZE 5
 
 // ======================================== KERNEL ========================================
 __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int height, int num_channel) 
@@ -24,29 +23,29 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
     // ===== Pixel Variables
     int pixSum, numPixels;
 
-    // ===== Iterate over all channels
-    for(int channel = 0; channel < num_channel; channel++)
-    {
-        // ===== Pixel Position
-        int col = blockIdx.x * TILE_DIM + threadIdx.x;
-        int row = blockIdx.y * TILE_DIM + threadIdx.y;
+    // ===== Global Pixel Position
+    int col_global = blockIdx.x * blockDim.x + threadIdx.x;
+    int row_global = blockIdx.y * blockDim.y + threadIdx.y;
 
-        // ===== Check if pixel is inside image
-        if(col > -1 && col < width && row > -1 && row < height ) 
+    // ===== Check if pixel is inside image
+    if(col_global > -1 && col_global < width && row_global > -1 && row_global < height ) 
+    {
+        // ===== Iterate over all channels
+        for(int channel = 0; channel < num_channel; channel++)
         {
             // ===== Initialize Pixel Variables
             pixSum = 0;
             numPixels = 0;
             
-            // ===== Iterate over row
+            // ===== Iterate over row_global
             for(int blurRow = -BLUR_SIZE; blurRow < BLUR_SIZE + 1; ++blurRow) 
             {
                 // ===== Iterate over column
                 for(int blurCol = -BLUR_SIZE; blurCol < BLUR_SIZE + 1; ++blurCol) 
                 {
                     // ===== Current Pixel Position
-                    int curRow = row + blurRow;
-                    int curCol = col + blurCol;
+                    int curRow = row_global + blurRow;
+                    int curCol = col_global + blurCol;
 
                     // ===== Check if pixel is inside filter kernel
                     if(curRow > -1 && curRow < height && curCol > -1 && curCol < width)
@@ -59,7 +58,7 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
             }
 
             // ===== Save Pixel Value
-            out[row * width * num_channel + col * num_channel + channel] = (unsigned char)(pixSum/(numPixels));
+            out[row_global * width * num_channel + col_global * num_channel + channel] = (unsigned char)(pixSum/numPixels);
         }
     }
 }
@@ -92,9 +91,9 @@ int main(int argc, char *argv[])
     cudaMemcpy(Dev_Input_Image, image, sizeof(unsigned char) * height * width * n, cudaMemcpyHostToDevice);
     
     // ===== Kernel Dimensions
-    dim3 blockSize(BLOCK_SIZE, BLOCK_SIZE);
-    dim3 gridSize(width/blockSize.x+1, height/blockSize.y+1);
-    
+    dim3 blockSize(16, 16);
+    dim3 gridSize((width + blockSize.x - 1) / blockSize.x, (height + blockSize.y - 1) / blockSize.y);
+
     // ===== Start Time
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
