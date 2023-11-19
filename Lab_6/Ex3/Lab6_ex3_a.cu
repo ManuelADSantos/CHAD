@@ -22,7 +22,7 @@
 __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int height, int num_channel) 
 {   
     // ===== Pixel Variables
-    int pixVal, pixels;
+    int pixSum, numPixels;
 
     // ===== Iterate over all channels
     for(int channel = 0; channel < num_channel; channel++)
@@ -35,8 +35,8 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
         if(col > -1 && col < width && row > -1 && row < height ) 
         {
             // ===== Initialize Pixel Variables
-            pixVal = 0;
-            pixels = 0;
+            pixSum = 0;
+            numPixels = 0;
             
             // ===== Iterate over row
             for(int blurRow = -BLUR_SIZE; blurRow < BLUR_SIZE + 1; ++blurRow) 
@@ -52,14 +52,14 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
                     if(curRow > -1 && curRow < height && curCol > -1 && curCol < width)
                     {
                         // ===== Add Pixel Value
-                        pixVal += in[curRow * width * num_channel + curCol * num_channel + channel];
-                        pixels++;
+                        pixSum += in[curRow * width * num_channel + curCol * num_channel + channel];
+                        numPixels++;
                     }
                 }
             }
 
             // ===== Save Pixel Value
-            out[row * width * num_channel + col * num_channel + channel] = (unsigned char)(pixVal/(pixels));
+            out[row * width * num_channel + col * num_channel + channel] = (unsigned char)(pixSum/(numPixels));
         }
     }
 }

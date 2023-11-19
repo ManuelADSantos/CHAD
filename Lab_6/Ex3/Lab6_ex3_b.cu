@@ -23,13 +23,13 @@ __global__ void blurKernel_shared(unsigned char* in, unsigned char* out, int wid
     __shared__ unsigned char tile[BLOCK_SIZE*BLOCK_SIZE];
     int col = blockIdx.x * TILE_DIM + threadIdx.x;
     int row = blockIdx.y * TILE_DIM + threadIdx.y;
-    int pixVal;
-    int pixels;
+    int pixSum;
+    int numPixels;
 
     if(col > -1 && col < width && row > -1 && row < height )
     {
-        pixVal = 0;
-        pixels = 0;
+        pixSum = 0;
+        numPixels = 0;
         tile[row*width*num_channel + col*num_channel] = in[row*width*num_channel + col*num_channel];
         __syncthreads();
         for(int blurRow = -BLUR_SIZE; blurRow < BLUR_SIZE + 1; ++blurRow)
@@ -40,13 +40,13 @@ __global__ void blurKernel_shared(unsigned char* in, unsigned char* out, int wid
                 int curCol = col + blurCol;
                 if(curRow > -1 && curRow < height && curCol > -1 && curCol < width)
                 {
-                    pixVal += tile[curRow * width * num_channel + curCol * num_channel + channel];
-                    pixels++;
+                    pixSum += tile[curRow * width * num_channel + curCol * num_channel + channel];
+                    numPixels++;
                     __syncthreads();
                 }
             }
         }
-        out[row * width * num_channel + col * num_channel + channel] = (unsigned char)(pixVal/pixels);
+        out[row * width * num_channel + col * num_channel + channel] = (unsigned char)(pixSum/numPixels);
     }
 }
 
