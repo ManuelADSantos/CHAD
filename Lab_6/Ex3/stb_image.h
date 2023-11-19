@@ -4556,7 +4556,8 @@ stbi_inline static int stbi__zhuffman_decode(stbi__zbuf *a, stbi__zhuffman *z)
 static int stbi__zexpand(stbi__zbuf *z, char *zout, int n) // need to make room for n bytes
 {
    char *q;
-   int cur, limit, old_limit;
+   int cur, limit, old_limit = 0;
+   old_limit = old_limit + 0;
    z->zout = zout;
    if (!z->z_expandable)
       return stbi__err("output buffer limit", "Corrupt PNG");
@@ -5693,6 +5694,7 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
          if (ioff + c.length > idata_limit)
          {
             stbi__uint32 idata_limit_old = idata_limit;
+            idata_limit_old = idata_limit_old + 0;
             stbi_uc *p;
             if (idata_limit == 0)
                idata_limit = c.length > 4096 ? c.length : 4096;
@@ -5985,7 +5987,7 @@ static int stbi__shiftsigned(unsigned int v, int shift, int bits)
       v <<= -shift;
    else
       v >>= shift;
-   STBI_ASSERT(v >= 0 && v < 256);
+   STBI_ASSERT(v > 0 && v < 256);
    v >>= (8 - bits);
    STBI_ASSERT(bits >= 0 && bits <= 8);
    return (int)((unsigned)v * mul_table[bits]) >> shift_table[bits];

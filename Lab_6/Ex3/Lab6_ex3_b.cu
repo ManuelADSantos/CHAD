@@ -6,56 +6,98 @@
 // nvcc -o Lab6_ex3_b Lab6_ex3_b.cu -lrt
 // ============================================================================
 
-#include <stdio.h>
-#include <time.h>
-#include <curand_kernel.h>
-#include <cuda_runtime.h>
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image.h"
+#include "stb_image_write.h"
+#include <iostream>
+#define BLUR_SIZE 16
+#define R 0
+#define G 1
+#define B 2
+#define TILE_DIM 16
+#define BLOCK_SIZE 16
 
-__global__ void get_pi(unsigned long long int *count_circle, unsigned long long int *count_square, int seed)
-{
-    int idx = threadIdx.x + blockIdx.x * blockDim.x;
-
-    curandState state;
-    curand_init(seed, idx, 0, &state);
-
-    for(int i = 0; i < 100000; i++)
+__global__ void blurKernel_shared(unsigned char* in, unsigned char* out, int width, int height, int num_channel, int channel) {
+    
+    int pixVal;
+    int pixels;
+    for(int channel = 0; channel < num_channel; channel++)
     {
-        float x = curand_uniform(&state)*2.0 - 1.0;
-        float y = curand_uniform(&state)*2.0 - 1.0;
+        __shared__ unsigned char tile[BLOCK_SIZE*BLOCK_SIZE];
+        int col = blockIdx.x * TILE_DIM + threadIdx.x;
+        int row = blockIdx.y * TILE_DIM + threadIdx.y;
+        
 
-        if (x*x + y*y <= 1.0)
-            atomicAdd(count_circle, 1);
-        else
-            atomicAdd(count_square, 1);
+        if(col > -1 && col < width && row > -1 && row < height ) 
+        {
+            pixVal = 0;
+            pixels = 0;
+            tile[row*width*num_channel + col*num_channel] = in[row*width*num_channel + col*num_channel];
+            __syncthreads();
+            for(int blurRow = -BLUR_SIZE; blurRow < BLUR_SIZE + 1; ++blurRow) 
+            {
+                for(int blurCol = -BLUR_SIZE; blurCol < BLUR_SIZE + 1; ++blurCol) 
+                {
+                    int curRow = row + blurRow;
+                    int curCol = col + blurCol;
+                    if(curRow > -1 && curRow < height && curCol > -1 && curCol < width)
+                    {
+                        pixVal += tile[curRow * width * num_channel + curCol * num_channel + channel];
+                        pixels++;
+                        __syncthreads();
+                    }
+                }
+            }
+            out[row * width * num_channel + col * num_channel + channel] = (unsigned char)(pixVal/pixels);
+        }
     }
 }
 
+// ==================== MAIN ==================== 
+int main()
+{
+    int width, height, n;
+    unsigned char *image = stbi_load("image2.jpg",&width,&height,&n,0);
 
-int main(int argc, char *argv[])
-{   
-    unsigned long long int circle_host = 0, square_host = 0;
-    unsigned long long int *circle_device, *square_device;
-    int time_host = time(NULL);
+    // printf("Image width: %dpx, height: %dpx, channels: %d\n", width, height, n);
+    // return 0;
 
-    cudaMalloc((void**)&circle_device, sizeof(unsigned long long int));
-    cudaMalloc((void**)&square_device, sizeof(unsigned long long int));
+    unsigned char *output = (unsigned char*)malloc(width * height * n *sizeof(unsigned char));
+    unsigned char* Dev_Input_Image = NULL;
+    unsigned char* Dev_Output_Image = NULL;
+    
+    cudaMalloc((void**)&Dev_Input_Image, sizeof(unsigned char)* height * width * n);
+    cudaMalloc((void**)&Dev_Output_Image, sizeof(unsigned char)* height * width * n);
+    //kernel call
+    dim3 blockSize(BLOCK_SIZE, BLOCK_SIZE);
+    dim3 gridSize(width/blockSize.x+1, height/blockSize.y+1);
+    
+    // a)
+    //CLOCK_PROCESS_CPUTIME_ID - Profiling the execution time
+    struct timespec start, end;
+    
+    double initialTime=(start.tv_sec*1e3)+(start.tv_nsec*1e-6);
+    double finalTime=(end.tv_sec*1e3)+(end.tv_nsec*1e-6);
+    printf("Ex 2 a): %f ms\n", (finalTime - initialTime));
+    
+    //b)
+    cudaMalloc((void**)&Dev_Input_Image, sizeof(unsigned char)* height * width * n);
+    cudaMalloc((void**)&Dev_Output_Image, sizeof(unsigned char)* height * width * n);
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    cudaMemcpy(Dev_Input_Image, image, sizeof(unsigned char) * height * width * n, cudaMemcpyHostToDevice);
 
-    cudaMemcpy(circle_device, &circle_host, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
-    cudaMemcpy(square_device, &square_host, sizeof(unsigned long long int), cudaMemcpyHostToDevice);
-
-    int threadsPerBlock = 256;
-    int blocksPerGrid = 1024;
-
-    get_pi<<<blocksPerGrid, threadsPerBlock>>>(circle_device, square_device, time_host);
-
-    cudaMemcpy(&circle_host, circle_device, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
-    cudaMemcpy(&square_host, square_device, sizeof(unsigned long long int), cudaMemcpyDeviceToHost);
-
-    printf("Pi = %.10lf\n", (double)(4.0*circle_host/(double)(circle_host+square_host)));
-    printf("Points: Circle = %llu || Square = %llu\n", circle_host, square_host);
-
-    cudaFree(circle_device);
-    cudaFree(square_device);
-
+    blurKernel_shared <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height, n, R);
+    // blurKernel_shared <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height,n,G);
+    // blurKernel_shared <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height,n,B);
+    cudaDeviceSynchronize(); // we need this so the kernel is guaranteed to finish (and the output from the kernel will find a waiting standard output queue), before the application is allowed to exit
+    cudaMemcpy(image, Dev_Output_Image, sizeof(unsigned char) * height * width * n, cudaMemcpyDeviceToHost);
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    cudaFree(Dev_Input_Image);
+    cudaFree(Dev_Output_Image);
+    stbi_write_jpg("out_shared.jpg", width, height, n, image, width * n);
+    initialTime=(start.tv_sec*1e3)+(start.tv_nsec*1e-6);
+    finalTime=(end.tv_sec*1e3)+(end.tv_nsec*1e-6);
+    printf("Ex 2 b): %f ms\n", (finalTime - initialTime));
     return 0;
 }
