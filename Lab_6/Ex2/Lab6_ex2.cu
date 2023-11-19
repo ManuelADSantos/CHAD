@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 
     // ===== Print results and validate results (pi = 3.141 592 653 58979323846)
     printf("--> Pi = %.10lf\n", (double)(4.0*circle_sum/(double)(circle_sum + square_sum)));
-    printf("Points: Circle = %llu\n        Square = %llu\n", circle_sum, square_sum);
+    printf("Points: Circle = %llu\n        Square = %llu\n\n", circle_sum, square_sum);
 
     // ===== Free memory
     // -- Host
