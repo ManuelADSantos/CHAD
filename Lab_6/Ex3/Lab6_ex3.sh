@@ -14,7 +14,7 @@ nvcc -o Lab6_ex3_a Lab6_ex3_a.cu -lrt
 rm Lab6_ex3_a
 
 # Run exercise 3 b)
-echo -e "\n========== Running Lab6 Exercise 3 - b)Optimized =========="
-nvcc -o Lab6_ex3_b Lab6_ex3_b.cu -lrt
-./Lab6_ex3_b
-rm Lab6_ex3_b
+# echo -e "\n========== Running Lab6 Exercise 3 - b)Optimized =========="
+# nvcc -o Lab6_ex3_b Lab6_ex3_b.cu -lrt
+# ./Lab6_ex3_b
+# rm Lab6_ex3_b

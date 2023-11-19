@@ -82,7 +82,7 @@ __global__ void blurKernel_shared(unsigned char* in, unsigned char* out, int wid
 int main()
 {
     int width, height,n;
-    unsigned char *image = stbi_load("800x600Tanjiro.jpg",&width,&height,&n,0);
+    unsigned char *image = stbi_load("image.jpg",&width,&height,&n,0);
     unsigned char *output = (unsigned char*)malloc(width * height * n *sizeof(unsigned char));
     unsigned char* Dev_Input_Image = NULL;
     unsigned char* Dev_Output_Image = NULL;
