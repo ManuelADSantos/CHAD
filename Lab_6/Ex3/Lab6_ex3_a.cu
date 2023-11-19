@@ -8,17 +8,16 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image.h"
-#include "stb_image_write.h"
+#include "lib/stb_image.h"
+#include "lib/stb_image_write.h"
 #include <iostream>
 #define BLUR_SIZE 16
 #define TILE_DIM 16
 #define BLOCK_SIZE 16
 
-__global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int height, int num_channel, int channel) 
+__global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int height, int num_channel) 
 {
-    int pixVal;
-    int pixels;
+    int pixVal, pixels;
     for(int channel = 0; channel < num_channel; channel++)
     {
         int col = blockIdx.x * TILE_DIM + threadIdx.x;
@@ -51,12 +50,9 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
 int main()
 {
     int width, height, n;
-    unsigned char *image = stbi_load("image2.jpg",&width,&height,&n,0);
+    unsigned char *image = stbi_load("images/in/image2.jpg",&width,&height,&n,0);
 
-    // printf("Image width: %dpx, height: %dpx, channels: %d\n", width, height, n);
-    // return 0;
-
-    unsigned char *output = (unsigned char*)malloc(width * height * n *sizeof(unsigned char));
+     unsigned char *output = (unsigned char*)malloc(width * height * n *sizeof(unsigned char));
     unsigned char* Dev_Input_Image = NULL;
     unsigned char* Dev_Output_Image = NULL;
     
@@ -67,22 +63,20 @@ int main()
     dim3 gridSize(width/blockSize.x+1, height/blockSize.y+1);
     
     // a)
-    //CLOCK_PROCESS_CPUTIME_ID - Profiling the execution time
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
     cudaMemcpy(Dev_Input_Image, image, sizeof(unsigned char) * height * width * n, cudaMemcpyHostToDevice);
-    blurKernel <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height, n, 0);
-    // blurKernel <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height, n, G);
-    // blurKernel <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height, n, B);
+    blurKernel <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height, n);
+
     cudaDeviceSynchronize(); // we need this so the kernel is guaranteed to finish (and the output from the kernel will find a waiting standard output queue), before the application is allowed to exit
     cudaMemcpy(image, Dev_Output_Image, sizeof(unsigned char) * height * width * n, cudaMemcpyDeviceToHost);
     clock_gettime(CLOCK_MONOTONIC, &end);
     cudaFree(Dev_Input_Image);
     cudaFree(Dev_Output_Image);
-    stbi_write_jpg("output_image.jpg", width, height, n, image, width * n);
+    stbi_write_jpg("images/out/output_image.jpg", width, height, n, image, width * n);
     double initialTime=(start.tv_sec*1e3)+(start.tv_nsec*1e-6);
     double finalTime=(end.tv_sec*1e3)+(end.tv_nsec*1e-6);
-    printf("Ex 2 a): %f ms\n", (finalTime - initialTime));
+    printf("Time of execution: %f ms\n", (finalTime - initialTime));
     
     return 0;
 }
