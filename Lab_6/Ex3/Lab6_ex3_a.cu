@@ -12,7 +12,7 @@
 #include "lib/stb_image.h"
 #include "lib/stb_image_write.h"
 
-// ===== File Properties
+// ===== Kernel Properties
 #define BLUR_SIZE 4
 #define TILE_DIM 16
 #define BLOCK_SIZE 16
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     cudaMalloc((void**)&Dev_Input_Image, sizeof(unsigned char)* height * width * n);
     cudaMalloc((void**)&Dev_Output_Image, sizeof(unsigned char)* height * width * n);
     
-    // ===== Copy Host Memory to Device Memory
+    // ===== Copy Host Image to Device Image
     cudaMemcpy(Dev_Input_Image, image, sizeof(unsigned char) * height * width * n, cudaMemcpyHostToDevice);
     
     // ===== Kernel Dimensions
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
     // ===== End Time
     clock_gettime(CLOCK_MONOTONIC, &end);
 
-    // ===== Copy Device Memory to Host Memory
+    // ===== Copy Device Image to Host Image
     cudaMemcpy(image, Dev_Output_Image, sizeof(unsigned char) * height * width * n, cudaMemcpyDeviceToHost);
     
     // ===== Save Blurred Image
