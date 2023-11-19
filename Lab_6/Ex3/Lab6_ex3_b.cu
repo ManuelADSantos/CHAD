@@ -10,7 +10,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "lib/stb_image.h"
 #include "lib/stb_image_write.h"
-#include <iostream>
+
 #define BLUR_SIZE 16
 #define R 0
 #define G 1
@@ -51,10 +51,15 @@ __global__ void blurKernel_shared(unsigned char* in, unsigned char* out, int wid
 }
 
 // ==================== MAIN ==================== 
-int main()
+int main(int argc, char *argv[])
 {
+    // ===== Get correct image
+    int img_id = atoi(argv[1]);
+    char img_name[50];
+    sprintf(img_name, "images/in/image%d.jpg", img_id);
+
     int width, height, n;
-    unsigned char *image = stbi_load("images/in/image2.jpg",&width,&height,&n,0);
+    unsigned char *image = stbi_load(img_name,&width,&height,&n,0);
 
     // printf("Image width: %dpx, height: %dpx, channels: %d\n", width, height, n);
     // return 0;
@@ -85,7 +90,10 @@ int main()
     clock_gettime(CLOCK_MONOTONIC, &end);
     cudaFree(Dev_Input_Image);
     cudaFree(Dev_Output_Image);
-    stbi_write_jpg("images/out/out_shared.jpg", width, height, n, image, width * n);
+
+    sprintf(img_name, "images/out/image%d_shared.jpg", img_id);
+    stbi_write_jpg(img_name, width, height, n, image, width * n);
+
     double initialTime=(start.tv_sec*1e3)+(start.tv_nsec*1e-6);
     double finalTime=(end.tv_sec*1e3)+(end.tv_nsec*1e-6);
     printf("Time of execution: %f ms\n", (finalTime - initialTime));

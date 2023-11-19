@@ -6,77 +6,120 @@
 // nvcc -o Lab6_ex3_a Lab6_ex3_a.cu -lrt
 // ============================================================================
 
+// ===== Images Library
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "lib/stb_image.h"
 #include "lib/stb_image_write.h"
-#include <iostream>
-#define BLUR_SIZE 16
+
+// ===== File Properties
+#define BLUR_SIZE 4
 #define TILE_DIM 16
 #define BLOCK_SIZE 16
 
+
+// ======================================== KERNEL ========================================
 __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int height, int num_channel) 
-{
+{   
+    // ===== Pixel Variables
     int pixVal, pixels;
+
+    // ===== Iterate over all channels
     for(int channel = 0; channel < num_channel; channel++)
     {
+        // ===== Pixel Position
         int col = blockIdx.x * TILE_DIM + threadIdx.x;
         int row = blockIdx.y * TILE_DIM + threadIdx.y;
 
+        // ===== Check if pixel is inside image
         if(col > -1 && col < width && row > -1 && row < height ) 
         {
+            // ===== Initialize Pixel Variables
             pixVal = 0;
             pixels = 0;
-        
+            
+            // ===== Iterate over row
             for(int blurRow = -BLUR_SIZE; blurRow < BLUR_SIZE + 1; ++blurRow) 
             {
+                // ===== Iterate over column
                 for(int blurCol = -BLUR_SIZE; blurCol < BLUR_SIZE + 1; ++blurCol) 
                 {
+                    // ===== Current Pixel Position
                     int curRow = row + blurRow;
                     int curCol = col + blurCol;
+
+                    // ===== Check if pixel is inside filter kernel
                     if(curRow > -1 && curRow < height && curCol > -1 && curCol < width)
                     {
+                        // ===== Add Pixel Value
                         pixVal += in[curRow * width * num_channel + curCol * num_channel + channel];
                         pixels++;
                     }
                 }
             }
-            out[row * width * num_channel + col * num_channel + channel] = (unsigned char)(pixVal/pixels);
+
+            // ===== Save Pixel Value
+            out[row * width * num_channel + col * num_channel + channel] = (unsigned char)(pixVal/(pixels));
         }
     }
 }
 
-// ==================== MAIN ==================== 
-int main()
-{
-    int width, height, n;
-    unsigned char *image = stbi_load("images/in/image2.jpg",&width,&height,&n,0);
 
-     unsigned char *output = (unsigned char*)malloc(width * height * n *sizeof(unsigned char));
+// ======================================== MAIN ========================================
+int main(int argc, char *argv[])
+{
+    // ===== Get correct image
+    int img_id = atoi(argv[1]);
+    char img_name[50];
+    sprintf(img_name, "images/in/image%d.jpg", img_id);
+
+    // ===== Image Properties
+    int width, height, n;
+
+    // ===== Load Original Image
+    unsigned char *image = stbi_load(img_name,&width,&height,&n,0);
+    
+    // ===== Allocate Memory for Blurred Image
+    unsigned char *output = (unsigned char*)malloc(width * height * n *sizeof(unsigned char));
+    
+    // ===== Allocate Device Memory
     unsigned char* Dev_Input_Image = NULL;
     unsigned char* Dev_Output_Image = NULL;
-    
     cudaMalloc((void**)&Dev_Input_Image, sizeof(unsigned char)* height * width * n);
     cudaMalloc((void**)&Dev_Output_Image, sizeof(unsigned char)* height * width * n);
-    //kernel call
+    
+    // ===== Copy Host Memory to Device Memory
+    cudaMemcpy(Dev_Input_Image, image, sizeof(unsigned char) * height * width * n, cudaMemcpyHostToDevice);
+    
+    // ===== Kernel Dimensions
     dim3 blockSize(BLOCK_SIZE, BLOCK_SIZE);
     dim3 gridSize(width/blockSize.x+1, height/blockSize.y+1);
     
-    // a)
+    // ===== Start Time
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
-    cudaMemcpy(Dev_Input_Image, image, sizeof(unsigned char) * height * width * n, cudaMemcpyHostToDevice);
+    
+    // ===== Kernel Call
     blurKernel <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height, n);
-
-    cudaDeviceSynchronize(); // we need this so the kernel is guaranteed to finish (and the output from the kernel will find a waiting standard output queue), before the application is allowed to exit
-    cudaMemcpy(image, Dev_Output_Image, sizeof(unsigned char) * height * width * n, cudaMemcpyDeviceToHost);
+    
+    // ===== End Time
     clock_gettime(CLOCK_MONOTONIC, &end);
-    cudaFree(Dev_Input_Image);
-    cudaFree(Dev_Output_Image);
-    stbi_write_jpg("images/out/output_image.jpg", width, height, n, image, width * n);
+
+    // ===== Copy Device Memory to Host Memory
+    cudaMemcpy(image, Dev_Output_Image, sizeof(unsigned char) * height * width * n, cudaMemcpyDeviceToHost);
+    
+    // ===== Save Blurred Image
+    sprintf(img_name, "images/out/image%d_basic.jpg", img_id);
+    stbi_write_jpg(img_name, width, height, n, image, width * n);
+    
+    // ===== Print Time Results
     double initialTime=(start.tv_sec*1e3)+(start.tv_nsec*1e-6);
     double finalTime=(end.tv_sec*1e3)+(end.tv_nsec*1e-6);
     printf("Time of execution: %f ms\n", (finalTime - initialTime));
+    
+    // ===== Free Device Memory
+    cudaFree(Dev_Input_Image);
+    cudaFree(Dev_Output_Image);
     
     return 0;
 }
