@@ -15,65 +15,71 @@
 #include <stdlib.h>
 
 // ===== Kernel Properties
-#define BLUR_SIZE 3
+#define BLUR_SIZE 5
 
-// ======================================== KERNEL ========================================
 // ======================================== KERNEL ========================================
 __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int height, int num_channel) 
 {   
-    // ===== Pixel Variables
-    int pixSum, numPixels;
-
     // ===== Global Pixel Position
     int col_global = blockIdx.x * blockDim.x + threadIdx.x;
     int row_global = blockIdx.y * blockDim.y + threadIdx.y;
 
     // ===== Check if pixel is inside image
-    if(col_global > -1 && col_global < width && row_global > -1 && row_global < height ) 
+    if (col_global < width && row_global < height) 
     {
+        // ===== Shared Memory allocation outside the channel loop
+        __shared__ unsigned char tile[BLUR_SIZE * BLUR_SIZE];
+
         // ===== Iterate over all color channels
-        for(int channel = 0; channel < num_channel; channel++)
+        for (int channel = 0; channel < num_channel; channel++)
         {
-            // ===== Shared Memory
-            __shared__ unsigned char tile[BLUR_SIZE*BLUR_SIZE];
+            // ===== Calculate shared memory indices based on thread position
+            int col_local = threadIdx.x;
+            int row_local = threadIdx.y;
 
-            // ===== Local Pixel Position
-            int col_local = 0, row_local = 0;
-
-            for(int i = -BLUR_SIZE/2; i <= BLUR_SIZE/2; i++)
+            // ===== Populate shared memory tile
+            for (int i = -BLUR_SIZE / 2; i <= BLUR_SIZE / 2; i++)
             {
-                for(int j = -BLUR_SIZE/2; j <= BLUR_SIZE/2; j++)
+                for (int j = -BLUR_SIZE / 2; j <= BLUR_SIZE / 2; j++)
                 {
-                    // ===== Check if pixel is inside image
-                    if((row_global + i) < 0 || (row_global + i) >= height || (col_global + j) < 0 || (col_global + j) >= width)
-                        tile[row_local * BLUR_SIZE + col_local] = 0;
+                    int curRow = row_global + i;
+                    int curCol = col_global + j;
+
+                    // ===== Check boundaries and store pixel values in shared memory
+                    if (curRow >= 0 && curRow < height && curCol >= 0 && curCol < width)
+                    {
+                        tile[row_local * BLUR_SIZE + col_local] = in[(curRow * width + curCol) * num_channel + channel];
+                    }
                     else
-                        tile[row_local * BLUR_SIZE + col_local] = in[((row_global + i) * width  + (col_global + j)) * num_channel + channel];
-                    
+                    {
+                        tile[row_local * BLUR_SIZE + col_local] = 0; // Set default value for pixels outside image
+                    }
+
+                    // ===== Synchronize threads after each iteration
                     __syncthreads();
+
                     col_local++;
                 }
                 row_local++;
             }
 
             // ===== Calculate Pixel Sum
-            pixSum = 0;
-            numPixels = 0;
-            for(int i = 0; i < BLUR_SIZE; i++)
-            {
-                for(int j = 0; j < BLUR_SIZE; j++)
-                {
-                    pixSum += tile[i * BLUR_SIZE + j];
-                    __syncthreads();
-                    numPixels++;
-                }
-            }
+            int pixSum = 0;
+            int numPixels = 0;
 
-            // ===== Calculate Pixel Average
+            for (int i = 0; i < BLUR_SIZE * BLUR_SIZE; i++)
+            {
+                pixSum += tile[i];
+                numPixels++;
+            }
+            __syncthreads();
+
+            // Calculate Pixel Average
             out[row_global * width * num_channel + col_global * num_channel + channel] = (unsigned char)(pixSum / numPixels);
         }
     }
 }
+
 
 
 // ======================================== MAIN ========================================
@@ -89,7 +95,7 @@ int main(int argc, char *argv[])
 
     // ===== Load Original Image
     unsigned char *image = stbi_load(img_name,&width,&height,&n,0);
-    
+
     // ===== Allocate Memory for Blurred Image
     unsigned char *output = (unsigned char*)malloc(width * height * n *sizeof(unsigned char));
     
