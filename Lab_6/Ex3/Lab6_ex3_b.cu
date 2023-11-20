@@ -16,7 +16,7 @@
 
 // ===== Kernel Properties
 #define BLUR_SIZE 5
-#define TILE_SIZE 16
+#define TILE_SIZE 1
 
 // ======================================== KERNEL ========================================
 __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int height, int num_channel) 
