@@ -25,41 +25,55 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
     int idx_Global = blockIdx.x * blockDim.x + threadIdx.x;
 
     // ===== Shared Memory
-    __shared__ unsigned char shared_Image[TILE_SIZE*TILE_SIZE][BLUR_SIZE][BLUR_SIZE];
-
-    // if (idx_Global == 0)
-    //     printf("%i\n", TILE_SIZE*TILE_SIZE);
-
-    // if (blockIdx.x == 10)
-    //     printf("idx_Global: %5i || threadIdx.x = %3i || blockIdx.x = %4i\n", idx_Global, threadIdx.x, blockIdx.x);
+    __shared__ unsigned char shared_Image[TILE_SIZE*TILE_SIZE][BLUR_SIZE][BLUR_SIZE][3];
 
     // ===== Work on each color channel
     for (int channel = 0; channel < num_channel; channel++)
     {   
         // ===== Shared Memory Position
-        int local_row = 0, local_col = 0;
+        int local_row = 0, local_col = 0, count = 0;
 
+        // ===== Horizontal offset from Global Pixel
         for (int i = -BLUR_SIZE / 2; i <= BLUR_SIZE / 2; i++)
         {
+            // ===== Vertical offset from Global Pixel
             for (int j = -BLUR_SIZE / 2; j <= BLUR_SIZE / 2; j++)
             {
+                // ===== Out of Bounds of Image
                 if (idx_Global + i*width + j < 0 || idx_Global + i*width + j >= width*height)
-                    shared_Image[threadIdx.x][local_row][local_col] = 0;
+                {
+                    shared_Image[threadIdx.x][local_row][local_col][channel] = 0;  
+                    if (idx_Global == 0)
+                }
+                // ===== In Bounds of Image
                 else
-                    shared_Image[threadIdx.x][local_row][local_col] = in[idx_Global + i*width + j];
-                      
+                    shared_Image[threadIdx.x][local_row][local_col][channel] = (unsigned char)in[(idx_Global + i*width + j) * num_channel + channel];
+                    count++;
+                
+                // ===== Update Local Position (in kernel)
                 local_col++;
             }
+            // ===== Update Local Position (in kernel)
             local_row++;
             local_col = 0;
         }
         __syncthreads();
-
+            
         // ===== Blur Pixel
-        out[idx_Global] = shared_Image[threadIdx.x][2][2];
+        int sum = 0;
+        for (int i = 0; i < BLUR_SIZE; i++)
+        {
+            for (int j = 0; j < BLUR_SIZE; j++)
+            {
+                sum += shared_Image[threadIdx.x][i][j][channel];
+            }
+        }
+        __syncthreads();
+
+        // ===== Save Blurred Pixel
+        out[idx_Global * num_channel + channel] = (unsigned char)(sum / count);
         __syncthreads();
     }
-
 }
 
 
@@ -80,7 +94,7 @@ int main(int argc, char *argv[])
 
     // ===== Allocate Memory for Blurred Image
     unsigned char *output = (unsigned char*)malloc(width * height * n *sizeof(unsigned char));
-    
+
     // ===== Allocate Device Memory
     unsigned char* Dev_Input_Image = NULL;
     unsigned char* Dev_Output_Image = NULL;
@@ -93,11 +107,6 @@ int main(int argc, char *argv[])
     // ===== Kernel Dimensions
     int threadsPerBlock = TILE_SIZE * TILE_SIZE;
     int BlocksPerGrid = (width * height + threadsPerBlock - 1) / threadsPerBlock;
-
-    // printf("Threads per block: %i\n", threadsPerBlock);
-    // printf("Blocks per grid: %i\n", BlocksPerGrid);
-
-    // printf("width: %d || height: %d || n: %d\n", width, height, n);
 
     // ===== Start Time
     struct timespec start, end;
