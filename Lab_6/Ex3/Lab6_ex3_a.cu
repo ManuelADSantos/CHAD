@@ -15,7 +15,7 @@
 #include <stdlib.h>
 
 // ===== Kernel Properties
-#define BLUR_SIZE 1
+#define BLUR_SIZE 5
 
 // ======================================== KERNEL ========================================
 __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int height, int num_channel) 

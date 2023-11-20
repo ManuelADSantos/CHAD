@@ -16,6 +16,7 @@
 
 // ===== Kernel Properties
 #define BLUR_SIZE 5
+#define TILE_SIZE 4
 
 // ======================================== KERNEL ========================================
 __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int height, int num_channel) 
@@ -28,7 +29,7 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
     if (col_global < width && row_global < height) 
     {
         // ===== Shared Memory allocation outside the channel loop
-        __shared__ unsigned char tile[BLUR_SIZE * BLUR_SIZE];
+        __shared__ unsigned char tile[BLUR_SIZE * BLUR_SIZE * TILE_SIZE * TILE_SIZE];
 
         // ===== Iterate over all color channels
         for (int channel = 0; channel < num_channel; channel++)
@@ -75,7 +76,7 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
             __syncthreads();
 
             // Calculate Pixel Average
-            out[row_global * width * num_channel + col_global * num_channel + channel] = (unsigned char)(pixSum / numPixels);
+            out[(row_global * width + col_global) * num_channel + channel] = (unsigned char)(pixSum / numPixels);
         }
     }
 }
@@ -109,7 +110,7 @@ int main(int argc, char *argv[])
     cudaMemcpy(Dev_Input_Image, image, sizeof(unsigned char) * height * width * n, cudaMemcpyHostToDevice);
     
     // ===== Kernel Dimensions
-    dim3 blockSize(16, 16);
+    dim3 blockSize(TILE_SIZE, TILE_SIZE);
     dim3 gridSize((width + blockSize.x - 1) / blockSize.x, (height + blockSize.y - 1) / blockSize.y);
 
     // ===== Start Time
