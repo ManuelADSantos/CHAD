@@ -25,7 +25,7 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
     int idx_Global = blockIdx.x * blockDim.x + threadIdx.x;
 
     // ===== Shared Memory
-    __shared__ unsigned char shared_Image[TILE_SIZE*TILE_SIZE][BLUR_SIZE][BLUR_SIZE][3];
+    __shared__ unsigned char shared_Image[TILE_SIZE*TILE_SIZE][BLUR_SIZE*BLUR_SIZE];
 
     // ===== Work on each color channel
     for (int channel = 0; channel < num_channel; channel++)
@@ -42,12 +42,11 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
                 // ===== Out of Bounds of Image
                 if (idx_Global + i*width + j < 0 || idx_Global + i*width + j >= width*height)
                 {
-                    shared_Image[threadIdx.x][local_row][local_col][channel] = 0;  
-                    if (idx_Global == 0)
+                    shared_Image[threadIdx.x][local_row*BLUR_SIZE + local_col] = 0;  
                 }
                 // ===== In Bounds of Image
                 else
-                    shared_Image[threadIdx.x][local_row][local_col][channel] = (unsigned char)in[(idx_Global + i*width + j) * num_channel + channel];
+                    shared_Image[threadIdx.x][local_row*BLUR_SIZE + local_col] = (unsigned char)in[(idx_Global + i*width + j) * num_channel + channel];
                     count++;
                 
                 // ===== Update Local Position (in kernel)
@@ -65,13 +64,13 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
         {
             for (int j = 0; j < BLUR_SIZE; j++)
             {
-                sum += shared_Image[threadIdx.x][i][j][channel];
+                sum += shared_Image[threadIdx.x][i*BLUR_SIZE + j];
             }
         }
         __syncthreads();
 
         // ===== Save Blurred Pixel
-        out[idx_Global * num_channel + channel] = (unsigned char)(sum / count);
+        out[idx_Global * num_channel + channel] = (unsigned char)(sum/count);
         __syncthreads();
     }
 }
