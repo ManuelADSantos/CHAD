@@ -15,7 +15,7 @@
 #include <stdlib.h>
 
 // ===== Kernel Properties
-#define BLUR_SIZE 5
+#define BLUR_SIZE 3
 
 // ======================================== KERNEL ========================================
 // ======================================== KERNEL ========================================
@@ -44,14 +44,17 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
             {
                 for(int j = -BLUR_SIZE/2; j <= BLUR_SIZE/2; j++)
                 {
-                    tile[row_local * BLUR_SIZE + col_local] = in[(row_global + i) * width * num_channel + (col_global + j) * num_channel + channel];
+                    // ===== Check if pixel is inside image
+                    if((row_global + i) < 0 || (row_global + i) >= height || (col_global + j) < 0 || (col_global + j) >= width)
+                        tile[row_local * BLUR_SIZE + col_local] = 0;
+                    else
+                        tile[row_local * BLUR_SIZE + col_local] = in[((row_global + i) * width  + (col_global + j)) * num_channel + channel];
+                    
+                    __syncthreads();
                     col_local++;
                 }
                 row_local++;
             }
-
-            // ===== Wait for all threads to finish copying to shared memory
-            __syncthreads();
 
             // ===== Calculate Pixel Sum
             pixSum = 0;
@@ -61,15 +64,13 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
                 for(int j = 0; j < BLUR_SIZE; j++)
                 {
                     pixSum += tile[i * BLUR_SIZE + j];
+                    __syncthreads();
                     numPixels++;
                 }
             }
 
             // ===== Calculate Pixel Average
             out[row_global * width * num_channel + col_global * num_channel + channel] = (unsigned char)(pixSum / numPixels);
-
-            // ===== Wait for all threads to finish copying to global memory
-            __syncthreads();
         }
     }
 }
