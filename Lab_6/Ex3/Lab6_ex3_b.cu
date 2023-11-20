@@ -49,11 +49,11 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
                     // ===== Check boundaries and store pixel values in shared memory
                     if (curRow >= 0 && curRow < height && curCol >= 0 && curCol < width)
                     {
-                        tile[row_local * BLUR_SIZE + col_local + threadIdx.y * TILE_SIZE + threadIdx.x] = in[(curRow * width + curCol) * num_channel + channel];
+                        tile[row_local * BLUR_SIZE + col_local + (threadIdx.x * TILE_SIZE) + threadIdx.y] = in[(curRow * width + curCol) * num_channel + channel];
                     }
                     else
                     {
-                        tile[row_local * BLUR_SIZE + col_local + threadIdx.y * TILE_SIZE + threadIdx.x] = 0; // Set default value for pixels outside image
+                        tile[row_local * BLUR_SIZE + col_local + (threadIdx.x * TILE_SIZE) + threadIdx.y] = 0; // Set default value for pixels outside image
                     }
 
                     // ===== Synchronize threads after each iteration
@@ -70,7 +70,7 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
 
             for (int i = 0; i < BLUR_SIZE * BLUR_SIZE; i++)
             {
-                pixSum += tile[i + threadIdx.y * TILE_SIZE + threadIdx.x];
+                pixSum += tile[i];
                 numPixels++;
             }
             __syncthreads();
