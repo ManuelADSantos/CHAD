@@ -16,7 +16,7 @@
 
 // ===== Kernel Properties
 #define BLUR_SIZE 5
-#define TILE_SIZE 2
+#define TILE_SIZE 16
 
 // ======================================== KERNEL ========================================
 __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int height, int num_channel) 
@@ -73,6 +73,7 @@ __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int
                 pixSum += tile[i];
                 numPixels++;
             }
+            printf("Local = (%i,%i) || Global = (%i,%i) || Value = %i\n", threadIdx.x, threadIdx.y, row_global, col_global, (pixSum / numPixels));
             __syncthreads();
 
             // Calculate Pixel Average
