@@ -22,64 +22,40 @@
 __global__ void blurKernel(unsigned char* in, unsigned char* out, int width, int height, int num_channel) 
 {   
     // ===== Global Pixel Position
-    int col_global = blockIdx.x * blockDim.x + threadIdx.x;
-    int row_global = blockIdx.y * blockDim.y + threadIdx.y;
+    int idx_Global = blockIdx.x * blockDim.x + threadIdx.x;
 
-    // ===== Check if pixel is inside image
-    if (col_global < width && row_global < height) 
-    {
-        // ===== Shared Memory allocation outside the channel loop
-        __shared__ unsigned char tile[BLUR_SIZE * BLUR_SIZE * TILE_SIZE * TILE_SIZE];
+    // ===== Shared Memory
+    __shared__ unsigned char shared_Image[TILE_SIZE*TILE_SIZE][BLUR_SIZE][BLUR_SIZE][3];
 
-        // ===== Iterate over all color channels
-        for (int channel = 0; channel < num_channel; channel++)
+    // if (blockIdx.x == 10)
+    //     printf("idx_Global: %5i || threadIdx.x = %3i || blockIdx.x = %4i\n", idx_Global, threadIdx.x, blockIdx.x);
+
+    // ===== Work on each color channel
+    for (int channel = 0; channel < num_channel; channel++)
+    {   
+        // ===== Shared Memory Position
+        int local_row = 0, local_col = 0;
+
+        for (int i = -BLUR_SIZE / 2; i <= BLUR_SIZE / 2; i++)
         {
-            // ===== Calculate shared memory indices based on thread position
-            int col_local = threadIdx.x;
-            int row_local = threadIdx.y;
-
-            // ===== Populate shared memory tile
-            for (int i = -BLUR_SIZE / 2; i <= BLUR_SIZE / 2; i++)
+            for (int j = -BLUR_SIZE / 2; j <= BLUR_SIZE / 2; j++)
             {
-                for (int j = -BLUR_SIZE / 2; j <= BLUR_SIZE / 2; j++)
-                {
-                    int curRow = row_global + i;
-                    int curCol = col_global + j;
-
-                    // ===== Check boundaries and store pixel values in shared memory
-                    if (curRow >= 0 && curRow < height && curCol >= 0 && curCol < width)
-                    {
-                        tile[row_local * BLUR_SIZE + col_local + (threadIdx.x * TILE_SIZE) + threadIdx.y] = in[(curRow * width + curCol) * num_channel + channel];
-                    }
-                    else
-                    {
-                        tile[row_local * BLUR_SIZE + col_local + (threadIdx.x * TILE_SIZE) + threadIdx.y] = 0; // Set default value for pixels outside image
-                    }
-
-                    // ===== Synchronize threads after each iteration
-                    __syncthreads();
-
-                    col_local++;
-                }
-                row_local++;
+                if (idx_Global + i*width + j < 0 || idx_Global + i*width + j >= width*height)
+                    shared_Image[threadIdx.x][local_row][local_col][channel] = 0;
+                else
+                    shared_Image[threadIdx.x][local_row][local_col][channel] = in[idx_Global + i*width + j];
+                      
+                local_col++;
             }
-
-            // ===== Calculate Pixel Sum
-            int pixSum = 0;
-            int numPixels = 0;
-
-            for (int i = 0; i < BLUR_SIZE * BLUR_SIZE; i++)
-            {
-                pixSum += tile[i];
-                numPixels++;
-            }
-            printf("Local = (%i,%i) || Global = (%i,%i) || Value = %i\n", threadIdx.x, threadIdx.y, row_global, col_global, (pixSum / numPixels));
-            __syncthreads();
-
-            // Calculate Pixel Average
-            out[(row_global * width + col_global) * num_channel + channel] = (unsigned char)(pixSum / numPixels);
+            local_row++;
+            local_col = 0;
         }
+        __syncthreads();
+
+        // ===== Blur Pixel
+        out[idx_Global] = shared_Image[threadIdx.x][2][2][channel];
     }
+
 }
 
 
@@ -111,15 +87,18 @@ int main(int argc, char *argv[])
     cudaMemcpy(Dev_Input_Image, image, sizeof(unsigned char) * height * width * n, cudaMemcpyHostToDevice);
     
     // ===== Kernel Dimensions
-    dim3 blockSize(TILE_SIZE, TILE_SIZE);
-    dim3 gridSize((width + blockSize.x - 1) / blockSize.x, (height + blockSize.y - 1) / blockSize.y);
+    int threadsPerBlock = TILE_SIZE * TILE_SIZE;
+    int BlocksPerGrid = (width * height + threadsPerBlock - 1) / threadsPerBlock;
+
+    // printf("Threads per block: %i\n", threadsPerBlock);
+    // printf("Blocks per grid: %i\n", BlocksPerGrid);
 
     // ===== Start Time
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
     
     // ===== Kernel Call
-    blurKernel <<<gridSize, blockSize>>>(Dev_Input_Image, Dev_Output_Image, width, height, n);
+    blurKernel <<<BlocksPerGrid, threadsPerBlock>>>(Dev_Input_Image, Dev_Output_Image, width, height, n);
     
     // ===== End Time
     clock_gettime(CLOCK_MONOTONIC, &end);
