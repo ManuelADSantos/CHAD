@@ -1,0 +1,2 @@
+error: unable to open output file '/usr/local/altera/14.1/hld/board/de1soc/examples/vector_add/bin_vectorAdd/vectorAdd.pre.bc': 'Error opening output file '/usr/local/altera/14.1/hld/board/de1soc/examples/vector_add/bin_vectorAdd/vectorAdd.pre.bc''
+1 error generated.
