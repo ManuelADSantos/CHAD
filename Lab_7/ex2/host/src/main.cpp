@@ -1,45 +1,22 @@
-// Copyright (C) 2013-2014 Altera Corporation, San Jose, California, USA. All rights reserved. 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-// software and associated documentation files (the "Software"), to deal in the Software 
-// without restriction, including without limitation the rights to use, copy, modify, merge, 
-// publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to 
-// whom the Software is furnished to do so, subject to the following conditions: 
-// The above copyright notice and this permission notice shall be included in all copies or 
-// substantial portions of the Software. 
-//  
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
-// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
-// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
-// OTHER DEALINGS IN THE SOFTWARE. 
-//  
-// This agreement shall be governed in all respects by the laws of the State of California and 
-// by the laws of the United States of America. 
-
-///////////////////////////////////////////////////////////////////////////////////
-// This host program executes a vector addition kernel to perform:
-//  C = A + B
-// where A, B and C are vectors with N elements.
+// ============================================================================
+// Programmer: Manuel Santos 2019231352
+// Date: 11/12/2023
+// ============================================================================
+// Summary: This program performs matrix multiplication on an FPGA device
+//         using OpenCL. The host program creates two input matrices and
+//         and one output matrix. The host program then sends the input
+//         matrices to the FPGA device. The FPGA device performs the matrix
+//         multiplication and sends the result back to the host program.
+//         The host program then verifies the result.
 //
-// This host program supports partitioning the problem across multiple OpenCL
-// devices if available. If there are M available devices, the problem is
-// divided so that each device operates on N/M points. The host program
-// assumes that all devices are of the same type (that is, the same binary can
-// be used), but the code can be generalized to support different device types
-// easily.
-//
-// Verification is performed against the same computation on the host CPU.
-///////////////////////////////////////////////////////////////////////////////////
+// This file contains the host code.
+// ============================================================================
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include "CL/opencl.h"
 #include "AOCL_Utils.h"
-
 
 using namespace aocl_utils;
 
@@ -69,8 +46,9 @@ void init_problem();
 void run();
 void cleanup();
 
-// Entry point.
-int main() {
+//////////////////////////////// ENTRY POINT ////////////////////////////////
+int main()
+{
   // Initialize OpenCL.
   if(!init_opencl()) {
     return -1;
@@ -89,26 +67,29 @@ int main() {
   return 0;
 }
 
-/////// HELPER FUNCTIONS ///////
-
-// Randomly generate a floating-point number between -10 and 10.
-float rand_float() {
+//////////////////////////////// HELPER FUNCTIONS ////////////////////////////////
+// ===== Randomly generate a floating-point number between -10 and 10.
+float rand_float() 
+{
   return float(rand()) / float(RAND_MAX) * 20.0f - 10.0f;
 }
 
-// Initializes the OpenCL objects.
-bool init_opencl() {
+// ===== Initializes the OpenCL objects.
+bool init_opencl()
+{
   cl_int status;
 
   printf("Initializing OpenCL\n");
 
-  if(!setCwdToExeDir()) {
+  if(!setCwdToExeDir())
+  {
     return false;
   }
 
   // Get the OpenCL platform.
   platform = findPlatform("Altera");
-  if(platform == NULL) {
+  if(platform == NULL)
+  {
     printf("ERROR: Unable to find Altera OpenCL platform.\n");
     return false;
   }
@@ -117,7 +98,8 @@ bool init_opencl() {
   device.reset(getDevices(platform, CL_DEVICE_TYPE_ALL, &num_devices));
   printf("Platform: %s\n", getPlatformName(platform).c_str());
   printf("Using %d device(s)\n", num_devices);
-  for(unsigned i = 0; i < num_devices; ++i) {
+  for(unsigned i = 0; i < num_devices; ++i)
+  {
     printf("  %s\n", getDeviceName(device[i]).c_str());
   }
 
@@ -143,7 +125,8 @@ bool init_opencl() {
   input_b_buf.reset(num_devices);
   output_buf.reset(num_devices);
 
-  for(unsigned i = 0; i < num_devices; ++i) {
+  for(unsigned i = 0; i < num_devices; ++i) 
+  {
     // Command queue.
     queue[i] = clCreateCommandQueue(context, device[i], CL_QUEUE_PROFILING_ENABLE, &status);
     checkError(status, "Failed to create command queue");
@@ -158,7 +141,8 @@ bool init_opencl() {
 
     // Spread out the remainder of the elements over the first
     // N % num_devices.
-    if(i < (N % num_devices)) {
+    if(i < (N % num_devices))
+    {
       n_per_device[i]++;
     }
 
@@ -180,9 +164,11 @@ bool init_opencl() {
   return true;
 }
 
-// Initialize the data for the problem. Requires num_devices to be known.
-void init_problem() {
-  if(num_devices == 0) {
+// ===== Initialize the data for the problem. Requires num_devices to be known.
+void init_problem()
+{
+  if(num_devices == 0)
+  {
     checkError(-1, "No devices");
   }
 
@@ -191,17 +177,17 @@ void init_problem() {
   output.reset(num_devices);
   ref_output.reset(num_devices);
 
-  // Generate input vectors A and B and the reference output consisting
-  // of a total of N elements.
-  // We create separate arrays for each device so that each device has an
-  // aligned buffer. 
-  for(unsigned i = 0; i < num_devices; ++i) {
+  // Generate input vectors A and B and the reference output consisting of a total of N elements.
+  // We create separate arrays for each device so that each device has an aligned buffer. 
+  for(unsigned i = 0; i < num_devices; ++i)
+  {
     input_a[i].reset(n_per_device[i]);
     input_b[i].reset(n_per_device[i]);
     output[i].reset(n_per_device[i]);
     ref_output[i].reset(n_per_device[i]);
 
-    for(unsigned j = 0; j < n_per_device[i]; ++j) {
+    for(unsigned j = 0; j < n_per_device[i]; ++j)
+    {
       input_a[i][j] = rand_float();
       input_b[i][j] = rand_float();
     }
@@ -209,20 +195,25 @@ void init_problem() {
     int ii, jj, kk;
     float sum;
 
-    for (ii = 0; ii < 1024; ii++) {
-        for (jj = 0; jj < 1024; jj++) {
-            sum = 0;
-            for (kk = 0; kk < 1024; kk++) {
-                // accumulate element-wise product
-                sum += input_a[i][ii*1024 + kk] * input_b[i][kk*1024 + jj];
-            }
-            ref_output[i][ii*1024 + jj] = sum;
+    for (ii = 0; ii < 1024; ii++)
+    {
+      for (jj = 0; jj < 1024; jj++)
+      {
+        sum = 0;
+        for (kk = 0; kk < 1024; kk++)
+        {
+          // accumulate element-wise product
+          sum += input_a[i][ii*1024 + kk] * input_b[i][kk*1024 + jj];
         }
+        ref_output[i][ii*1024 + jj] = sum;
+      }
     }
-}
+  }
 }
 
-void run() {
+//////////////////////////////// RUN KERNEL ////////////////////////////////
+void run()
+{
   cl_int status;
 
   const double start_time = getCurrentTimestamp();
@@ -231,18 +222,16 @@ void run() {
   scoped_array<cl_event> kernel_event(num_devices);
   scoped_array<cl_event> finish_event(num_devices);
 
-  for(unsigned i = 0; i < num_devices; ++i) {
-
+  for(unsigned i = 0; i < num_devices; ++i)
+  {
     // Transfer inputs to each device. Each of the host buffers supplied to
     // clEnqueueWriteBuffer here is already aligned to ensure that DMA is used
     // for the host-to-device transfer.
     cl_event write_event[2];
-    status = clEnqueueWriteBuffer(queue[i], input_a_buf[i], CL_FALSE,
-        0, n_per_device[i] * sizeof(float), input_a[i], 0, NULL, &write_event[0]);
+    status = clEnqueueWriteBuffer(queue[i], input_a_buf[i], CL_FALSE, 0, n_per_device[i] * sizeof(float), input_a[i], 0, NULL, &write_event[0]);
     checkError(status, "Failed to transfer input A");
 
-    status = clEnqueueWriteBuffer(queue[i], input_b_buf[i], CL_FALSE,
-        0, n_per_device[i] * sizeof(float), input_b[i], 0, NULL, &write_event[1]);
+    status = clEnqueueWriteBuffer(queue[i], input_b_buf[i], CL_FALSE, 0, n_per_device[i] * sizeof(float), input_b[i], 0, NULL, &write_event[1]);
     checkError(status, "Failed to transfer input B");
 
     // Set kernel arguments.
@@ -275,13 +264,11 @@ void run() {
     global_work_size[1]=1024;
     printf("Launching for device %d (%d elements)\n", i, global_work_size);
 
-    status = clEnqueueNDRangeKernel(queue[i], kernel[i], 2, NULL,
-        global_work_size, NULL, 2, write_event, &kernel_event[i]); //passe para 0 caso n funcione
+    status = clEnqueueNDRangeKernel(queue[i], kernel[i], 2, NULL, global_work_size, NULL, 2, write_event, &kernel_event[i]); //passe para 0 caso n funcione
     checkError(status, "Failed to launch kernel");
 
     // Read the result. This the final operation.
-    status = clEnqueueReadBuffer(queue[i], output_buf[i], CL_FALSE,
-        0, n_per_device[i] * sizeof(float), output[i], 1, &kernel_event[i], &finish_event[i]);
+    status = clEnqueueReadBuffer(queue[i], output_buf[i], CL_FALSE, 0, n_per_device[i] * sizeof(float), output[i], 1, &kernel_event[i], &finish_event[i]);
 
     // Release local events.
     clReleaseEvent(write_event[0]);
@@ -297,24 +284,28 @@ void run() {
   printf("\nTime: %0.3f ms\n", (end_time - start_time) * 1e3);
 
   // Get kernel times using the OpenCL event profiling API.
-  for(unsigned i = 0; i < num_devices; ++i) {
+  for(unsigned i = 0; i < num_devices; ++i)
+  {
     cl_ulong time_ns = getStartEndTime(kernel_event[i]);
     printf("Kernel time (device %d): %0.3f ms\n", i, double(time_ns) * 1e-6);
   }
 
   // Release all events.
-  for(unsigned i = 0; i < num_devices; ++i) {
+  for(unsigned i = 0; i < num_devices; ++i)
+  {
     clReleaseEvent(kernel_event[i]);
     clReleaseEvent(finish_event[i]);
   }
 
   // Verify results.
   bool pass = true;
-  for(unsigned i = 0; i < num_devices && pass; ++i) {
-    for(unsigned j = 0; j < n_per_device[i] && pass; ++j) {
-      if(fabsf(output[i][j] - ref_output[i][j]) > 1.0e-5f) {
-        printf("Failed verification @ device %d, index %d\nOutput: %f\nReference: %f\n",
-            i, j, output[i][j], ref_output[i][j]);
+  for(unsigned i = 0; i < num_devices && pass; ++i)
+  {
+    for(unsigned j = 0; j < n_per_device[i] && pass; ++j)
+    {
+      if(fabsf(output[i][j] - ref_output[i][j]) > 1.0e-5f)
+      {
+        printf("Failed verification @ device %d, index %d\nOutput: %f\nReference: %f\n", i, j, output[i][j], ref_output[i][j]);
         pass = false;
       }
     }
@@ -323,30 +314,44 @@ void run() {
   printf("\nVerification: %s\n", pass ? "PASS" : "FAIL");
 }
 
-// Free the resources allocated during initialization
-void cleanup() {
-  for(unsigned i = 0; i < num_devices; ++i) {
-    if(kernel && kernel[i]) {
+//////////////////////////////// FREE RESOURCES ////////////////////////////////
+void cleanup()
+{
+  for(unsigned i = 0; i < num_devices; ++i)
+  {
+    if(kernel && kernel[i])
+    {
       clReleaseKernel(kernel[i]);
     }
-    if(queue && queue[i]) {
+
+    if(queue && queue[i])
+    {
       clReleaseCommandQueue(queue[i]);
     }
-    if(input_a_buf && input_a_buf[i]) {
+
+    if(input_a_buf && input_a_buf[i])
+    {
       clReleaseMemObject(input_a_buf[i]);
     }
-    if(input_b_buf && input_b_buf[i]) {
+
+    if(input_b_buf && input_b_buf[i])
+    {
       clReleaseMemObject(input_b_buf[i]);
     }
-    if(output_buf && output_buf[i]) {
+
+    if(output_buf && output_buf[i])
+    {
       clReleaseMemObject(output_buf[i]);
     }
   }
 
-  if(program) {
+  if(program)
+  {
     clReleaseProgram(program);
   }
-  if(context) {
+
+  if(context)
+  {
     clReleaseContext(context);
   }
 }
