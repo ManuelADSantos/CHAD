@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:Lab_7/ex2/main.cpp
 //IMPORTANT NOTE - for simplicity, just like in CUDA, I consider a matriz with dimensions [SIZE*SIZE]
+========
+//IMPORTANT NOTE - for simplicity, just like in CUDA, I consider a matrix/image with dimensions [SIZE*SIZE]
+>>>>>>>> de23c54e21aed2989ab3c65eeb37f0ab0eb97cc0:Lab_7/ex3/main.cpp
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,13 +21,16 @@ scoped_array<cl_command_queue> queue; // num_devices elements
 cl_program program = NULL;
 scoped_array<cl_kernel> kernel; // num_devices elements
 scoped_array<cl_mem> input_a_buf; // num_devices elements
-scoped_array<cl_mem> input_b_buf; // num_devices elements
 scoped_array<cl_mem> output_buf; // num_devices elements
 
 // Problem data.
 const unsigned SIZE = 1000;
 const unsigned N = SIZE * SIZE; // problem size 
+<<<<<<<< HEAD:Lab_7/ex2/main.cpp
 scoped_array<scoped_aligned_ptr<float> > input_a, input_b; // num_devices elements
+========
+scoped_array<scoped_aligned_ptr<float> > input_a; // num_devices elements
+>>>>>>>> de23c54e21aed2989ab3c65eeb37f0ab0eb97cc0:Lab_7/ex3/main.cpp
 scoped_array<scoped_aligned_ptr<float> > output; // num_devices elements
 scoped_array<scoped_array<float> > ref_output; // num_devices elements
 scoped_array<unsigned> n_per_device; // num_devices elements
@@ -93,7 +100,11 @@ bool init_opencl() {
 
   // Create the program for all device. Use the first device as the
   // representative device (assuming all device are of the same type).
+<<<<<<<< HEAD:Lab_7/ex2/main.cpp
   std::string binary_file = getBoardBinaryFile("vectorMul", device[0]);
+========
+  std::string binary_file = getBoardBinaryFile("colorToGrey", device[0]);
+>>>>>>>> de23c54e21aed2989ab3c65eeb37f0ab0eb97cc0:Lab_7/ex3/main.cpp
   printf("Using AOCX: %s\n", binary_file.c_str());
   program = createProgramFromBinary(context, binary_file.c_str(), device, num_devices);
 
@@ -106,7 +117,6 @@ bool init_opencl() {
   kernel.reset(num_devices);
   n_per_device.reset(num_devices);
   input_a_buf.reset(num_devices);
-  input_b_buf.reset(num_devices);
   output_buf.reset(num_devices);
 
   for(unsigned i = 0; i < num_devices; ++i) {
@@ -115,7 +125,11 @@ bool init_opencl() {
     checkError(status, "Failed to create command queue");
 
     // Kernel.
+<<<<<<<< HEAD:Lab_7/ex2/main.cpp
     const char *kernel_name = "vectorMul";
+========
+    const char *kernel_name = "colorToGrey";
+>>>>>>>> de23c54e21aed2989ab3c65eeb37f0ab0eb97cc0:Lab_7/ex3/main.cpp
     kernel[i] = clCreateKernel(program, kernel_name, &status);
     checkError(status, "Failed to create kernel");
 
@@ -130,12 +144,8 @@ bool init_opencl() {
 
     // Input buffers.
     input_a_buf[i] = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-        n_per_device[i] * sizeof(float), NULL, &status);
+        n_per_device[i] * 3 * sizeof(float), NULL, &status);
     checkError(status, "Failed to create buffer for input A");
-
-    input_b_buf[i] = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-        n_per_device[i] * sizeof(float), NULL, &status);
-    checkError(status, "Failed to create buffer for input B");
 
     // Output buffer.
     output_buf[i] = clCreateBuffer(context, CL_MEM_WRITE_ONLY, 
@@ -153,7 +163,6 @@ void init_problem() {
   }
 
   input_a.reset(num_devices);
-  input_b.reset(num_devices);
   output.reset(num_devices);
   ref_output.reset(num_devices);
 
@@ -162,15 +171,21 @@ void init_problem() {
   // We create separate arrays for each device so that each device has an
   // aligned buffer. 
   for(unsigned i = 0; i < num_devices; ++i) {
-    input_a[i].reset(n_per_device[i]);
-    input_b[i].reset(n_per_device[i]);
+    input_a[i].reset(n_per_device[i]*3);
     output[i].reset(n_per_device[i]);
     ref_output[i].reset(n_per_device[i]);
 
     for(unsigned j = 0; j < n_per_device[i]; ++j) {
+<<<<<<<< HEAD:Lab_7/ex2/main.cpp
       input_a[i][j] = rand_float();
       input_b[i][j] = rand_float();
       //ref_output[i][j] = input_a[i][j] + input_b[i][j];
+========
+      input_a[i][j*3] = rand_float();
+      input_a[i][j*3 + 1] = rand_float();
+      input_a[i][j*3 + 2] = rand_float();
+      ref_output[i][j] = 0.21 * input_a[i][j*3] + 0.71 * x[i][j*3 + 1] + 0.07 * x[i][j*3 + 2];
+>>>>>>>> de23c54e21aed2989ab3c65eeb37f0ab0eb97cc0:Lab_7/ex3/main.cpp
     }
   }
 
@@ -198,20 +213,13 @@ void run() {
     // for the host-to-device transfer.
     cl_event write_event[2];
     status = clEnqueueWriteBuffer(queue[i], input_a_buf[i], CL_FALSE,
-        0, n_per_device[i] * sizeof(float), input_a[i], 0, NULL, &write_event[0]);
+        0, n_per_device[i] * 3 * sizeof(float), input_a[i], 0, NULL, &write_event[0]);
     checkError(status, "Failed to transfer input A");
-
-    status = clEnqueueWriteBuffer(queue[i], input_b_buf[i], CL_FALSE,
-        0, n_per_device[i] * sizeof(float), input_b[i], 0, NULL, &write_event[1]);
-    checkError(status, "Failed to transfer input B");
 
     // Set kernel arguments.
     unsigned argi = 0;
 
     status = clSetKernelArg(kernel[i], argi++, sizeof(cl_mem), &input_a_buf[i]);
-    checkError(status, "Failed to set argument %d", argi - 1);
-
-    status = clSetKernelArg(kernel[i], argi++, sizeof(cl_mem), &input_b_buf[i]);
     checkError(status, "Failed to set argument %d", argi - 1);
 
     status = clSetKernelArg(kernel[i], argi++, sizeof(cl_mem), &output_buf[i]);
@@ -289,9 +297,6 @@ void cleanup() {
     }
     if(input_a_buf && input_a_buf[i]) {
       clReleaseMemObject(input_a_buf[i]);
-    }
-    if(input_b_buf && input_b_buf[i]) {
-      clReleaseMemObject(input_b_buf[i]);
     }
     if(output_buf && output_buf[i]) {
       clReleaseMemObject(output_buf[i]);
