@@ -1,0 +1,51 @@
+///////////////////////// Connect to FPGA /////////////////////////
+======================(In host machine)======================
+dmesg | grep tty
+sudo screen /dev/ttyUSB0 115200
+
+source ./init_opencl.sh
+aocl version
+aocl diagnose
+
+
+///////////////////////// FPGA IP Config /////////////////////////
+======================(In FPGA)======================
+ifconfig 
+ifconfig eth0 10.206.106.210
+ifconfig
+
+
+////////////////////// Cross Compilation //////////////////////
+======================(In host machine)======================
+export ALTERAOCLSDKROOT=/usr/local/altera/14.1/hld/
+source /usr/local/altera/14.1/hld/init_opencl.sh
+
+aocl version
+aoc --list-boards
+
+sudo /usr/local/altera/14.1/embedded/embedded_command_shell.sh
+export ALTERAOCLSDKROOT=/usr/local/altera/14.1/hld/
+source /usr/local/altera/14.1/hld/init_opencl.sh
+
+cd /.../ex2
+make
+
+
+////////////////////// Device Synthesis ////////////////////// 
+======================(In host machine)======================
+export ALTERAOCLSDKROOT=/usr/local/altera/14.1/hld/
+source /usr/local/altera/14.1/hld/init_opencl.sh
+
+aoc device/matMul.cl --profile -v --report --sw-dimm-partition -o bin/matMul.aocx
+
+
+///////////////////////// Send to FPGA /////////////////////////
+======================(From host to FPGA)======================
+send >>matMul<< (executable) to FPGA
+send >>bin/matMul.aocx<< (kernel) to FPGA
+
+
+///////////////////////// Run on FPGA ///////////////////////// 
+======================(In FPGA)======================
+aocl program /dev/acl0 matMul.aocx (build circuit)
+./matMul (run program)

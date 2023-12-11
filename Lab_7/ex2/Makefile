@@ -3,10 +3,10 @@ TARGET = matMul
 
 # Where is the Altera SDK for OpenCL software?
 ifeq ($(wildcard $(ALTERAOCLSDKROOT)),)
-	$(error Set ALTERAOCLSDKROOT to the root directory of the Altera SDK for OpenCL software installation)
+$(error Set ALTERAOCLSDKROOT to the root directory of the Altera SDK for OpenCL software installation)
 endif
 ifeq ($(wildcard $(ALTERAOCLSDKROOT)/host/include/CL/opencl.h),)
-	$(error Set ALTERAOCLSDKROOT to the root directory of the Altera SDK for OpenCL software installation.)
+$(error Set ALTERAOCLSDKROOT to the root directory of the Altera SDK for OpenCL software installation.)
 endif
 
 # Libraries to use, objects to compile

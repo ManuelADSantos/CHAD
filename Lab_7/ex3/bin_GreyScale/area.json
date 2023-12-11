@@ -1,0 +1,169 @@
+{
+  "kernels":
+  [
+    {
+      "name":"GreyScale"
+      , "bbtables":
+      [
+        {
+          "header":
+          [
+            {
+              "data":
+              [
+                {
+                  "value":"GreyScale.wii_blk"
+                  , "colspan":2
+                }
+                , {
+                  "value":"Resources"
+                  , "colspan":4
+                }
+              ]
+            }
+            , {
+              "data":
+              [
+                {
+                  "value":"Operations"
+                  , "colspan":2
+                }
+                , "LEs"
+                , "FFs"
+                , "RAMs"
+                , "DSPs"
+              ]
+            }
+          ]
+          , "body":
+          [
+            {
+              "data":
+              [
+                {
+                  "value":"Unknown Line"
+                  , "file":0
+                  , "line":0
+                  , "colspan":2
+                }
+                , "0"
+                , "0"
+                , "0"
+                , "0"
+              ]
+            }
+          ]
+        }
+        , {
+          "header":
+          [
+            {
+              "data":
+              [
+                {
+                  "value":"entry"
+                  , "colspan":2
+                }
+                , {
+                  "value":"Resources"
+                  , "colspan":4
+                }
+              ]
+            }
+            , {
+              "data":
+              [
+                {
+                  "value":"Operations"
+                  , "colspan":2
+                }
+                , "LEs"
+                , "FFs"
+                , "RAMs"
+                , "DSPs"
+              ]
+            }
+          ]
+          , "body":
+          [
+            {
+              "data":
+              [
+                {
+                  "value":"GreyScale.cl:20"
+                  , "file":1
+                  , "line":20
+                  , "colspan":2
+                }
+                , "80"
+                , "64"
+                , "0"
+                , "0"
+              ]
+            }
+            , {
+              "data":
+              [
+                {
+                  "value":"GreyScale.cl:24"
+                  , "file":1
+                  , "line":24
+                  , "colspan":2
+                }
+                , "927"
+                , "2502"
+                , "16"
+                , "0"
+              ]
+            }
+            , {
+              "data":
+              [
+                {
+                  "value":"GreyScale.cl:32"
+                  , "file":1
+                  , "line":32
+                  , "colspan":2
+                }
+                , "21154"
+                , "23531"
+                , "18"
+                , "3"
+              ]
+            }
+            , {
+              "data":
+              [
+                {
+                  "value":"GreyScale.cl:34"
+                  , "file":1
+                  , "line":34
+                  , "colspan":2
+                }
+                , "1"
+                , "1"
+                , "0"
+                , "0"
+              ]
+            }
+            , {
+              "data":
+              [
+                {
+                  "value":"Unknown Line"
+                  , "file":0
+                  , "line":0
+                  , "colspan":2
+                }
+                , "926"
+                , "1193"
+                , "2"
+                , "0"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
