@@ -1,10 +1,45 @@
-//IMPORTANT NOTE - for simplicity, just like in CUDA, I consider a matriz with dimensions [SIZE*SIZE]
+// Copyright (C) 2013-2014 Altera Corporation, San Jose, California, USA. All rights reserved. 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+// software and associated documentation files (the "Software"), to deal in the Software 
+// without restriction, including without limitation the rights to use, copy, modify, merge, 
+// publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to 
+// whom the Software is furnished to do so, subject to the following conditions: 
+// The above copyright notice and this permission notice shall be included in all copies or 
+// substantial portions of the Software. 
+//  
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
+// OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
+// HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+// OTHER DEALINGS IN THE SOFTWARE. 
+//  
+// This agreement shall be governed in all respects by the laws of the State of California and 
+// by the laws of the United States of America. 
+
+///////////////////////////////////////////////////////////////////////////////////
+// This host program executes a vector addition kernel to perform:
+//  C = A + B
+// where A, B and C are vectors with N elements.
+//
+// This host program supports partitioning the problem across multiple OpenCL
+// devices if available. If there are M available devices, the problem is
+// divided so that each device operates on N/M points. The host program
+// assumes that all devices are of the same type (that is, the same binary can
+// be used), but the code can be generalized to support different device types
+// easily.
+//
+// Verification is performed against the same computation on the host CPU.
+///////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include "CL/opencl.h"
 #include "AOCL_Utils.h"
+
 
 using namespace aocl_utils;
 
@@ -17,19 +52,16 @@ scoped_array<cl_command_queue> queue; // num_devices elements
 cl_program program = NULL;
 scoped_array<cl_kernel> kernel; // num_devices elements
 scoped_array<cl_mem> input_a_buf; // num_devices elements
-scoped_array<cl_mem> input_b_buf; // num_devices elements
 scoped_array<cl_mem> output_buf; // num_devices elements
 
 // Problem data.
-const unsigned SIZE = 1000;
-const unsigned N = SIZE * SIZE; // problem size 
-scoped_array<scoped_aligned_ptr<float> > input_a, input_b; // num_devices elements
-scoped_array<scoped_aligned_ptr<float> > output; // num_devices elements
-scoped_array<scoped_array<float> > ref_output; // num_devices elements
+const unsigned N = 1024*1024; // problem size
+scoped_array<scoped_aligned_ptr<unsigned char> > input_a; // num_devices elements
+scoped_array<scoped_aligned_ptr<unsigned char> > output; // num_devices elements
+scoped_array<scoped_array<unsigned char> > ref_output; // num_devices elements
 scoped_array<unsigned> n_per_device; // num_devices elements
 
 // Function prototypes
-float rand_float();
 bool init_opencl();
 void init_problem();
 void run();
@@ -57,10 +89,7 @@ int main() {
 
 /////// HELPER FUNCTIONS ///////
 
-// Randomly generate a floating-point number between -10 and 10.
-float rand_float() {
-  return float(rand()) / float(RAND_MAX) * 20.0f - 10.0f;
-}
+
 
 // Initializes the OpenCL objects.
 bool init_opencl() {
@@ -93,7 +122,7 @@ bool init_opencl() {
 
   // Create the program for all device. Use the first device as the
   // representative device (assuming all device are of the same type).
-  std::string binary_file = getBoardBinaryFile("vectorMul", device[0]);
+  std::string binary_file = getBoardBinaryFile("GreyScale", device[0]);
   printf("Using AOCX: %s\n", binary_file.c_str());
   program = createProgramFromBinary(context, binary_file.c_str(), device, num_devices);
 
@@ -106,7 +135,6 @@ bool init_opencl() {
   kernel.reset(num_devices);
   n_per_device.reset(num_devices);
   input_a_buf.reset(num_devices);
-  input_b_buf.reset(num_devices);
   output_buf.reset(num_devices);
 
   for(unsigned i = 0; i < num_devices; ++i) {
@@ -115,7 +143,7 @@ bool init_opencl() {
     checkError(status, "Failed to create command queue");
 
     // Kernel.
-    const char *kernel_name = "vectorMul";
+    const char *kernel_name = "GreyScale";
     kernel[i] = clCreateKernel(program, kernel_name, &status);
     checkError(status, "Failed to create kernel");
 
@@ -130,16 +158,13 @@ bool init_opencl() {
 
     // Input buffers.
     input_a_buf[i] = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-        n_per_device[i] * sizeof(float), NULL, &status);
+        n_per_device[i] *3* sizeof(unsigned char), NULL, &status);
     checkError(status, "Failed to create buffer for input A");
 
-    input_b_buf[i] = clCreateBuffer(context, CL_MEM_READ_ONLY, 
-        n_per_device[i] * sizeof(float), NULL, &status);
-    checkError(status, "Failed to create buffer for input B");
 
     // Output buffer.
     output_buf[i] = clCreateBuffer(context, CL_MEM_WRITE_ONLY, 
-        n_per_device[i] * sizeof(float), NULL, &status);
+        n_per_device[i] * sizeof(unsigned char), NULL, &status);
     checkError(status, "Failed to create buffer for output");
   }
 
@@ -153,7 +178,6 @@ void init_problem() {
   }
 
   input_a.reset(num_devices);
-  input_b.reset(num_devices);
   output.reset(num_devices);
   ref_output.reset(num_devices);
 
@@ -163,22 +187,34 @@ void init_problem() {
   // aligned buffer. 
   for(unsigned i = 0; i < num_devices; ++i) {
     input_a[i].reset(n_per_device[i]);
-    input_b[i].reset(n_per_device[i]);
     output[i].reset(n_per_device[i]);
     ref_output[i].reset(n_per_device[i]);
 
-    for(unsigned j = 0; j < n_per_device[i]; ++j) {
-      input_a[i][j] = rand_float();
-      input_b[i][j] = rand_float();
-      //ref_output[i][j] = input_a[i][j] + input_b[i][j];
+    for(unsigned j = 0; j < n_per_device[i]*3; ++j) {
+      input_a[i][j] = 2;
     }
+
+
+  for(unsigned ii = 0; ii < n_per_device[i]; ++ii) {
+    output[i].reset(n_per_device[i]);
+    ref_output[i].reset(n_per_device[i]);
+
+  	unsigned char r;
+  	// red value for pixel
+  	unsigned char g;
+  	// green value for pixel
+  	unsigned char b;
+  	for(int ii = 0; ii < n_per_device[i]; ++ii){
+		r=input_a[i][3*ii];
+		// red value for pixel
+		g=input_a[i][3*ii+1];
+		// green value for pixel
+		b=input_a[i][3*ii+2];
+		ref_output[i][ii] = r*0.21f+g*0.71f+b*0.07f; //3 channels cada soma é channel
+	  }
   }
 
-  for (unsigned i = 0; i < SIZE; ++i) {
-      for (unsigned j = 0; j < SIZE; ++j) {
-          for (int k = 0; k < SIZE; k++)
-              ref_output[i][j] += input_a[i][k] * input_b[k][j];
-      }
+
   }
 }
 
@@ -196,14 +232,11 @@ void run() {
     // Transfer inputs to each device. Each of the host buffers supplied to
     // clEnqueueWriteBuffer here is already aligned to ensure that DMA is used
     // for the host-to-device transfer.
-    cl_event write_event[2];
+    cl_event write_event[1];
     status = clEnqueueWriteBuffer(queue[i], input_a_buf[i], CL_FALSE,
-        0, n_per_device[i] * sizeof(float), input_a[i], 0, NULL, &write_event[0]);
+        0, n_per_device[i] *3* sizeof(unsigned char), input_a[i], 0, NULL, &write_event[0]);
     checkError(status, "Failed to transfer input A");
 
-    status = clEnqueueWriteBuffer(queue[i], input_b_buf[i], CL_FALSE,
-        0, n_per_device[i] * sizeof(float), input_b[i], 0, NULL, &write_event[1]);
-    checkError(status, "Failed to transfer input B");
 
     // Set kernel arguments.
     unsigned argi = 0;
@@ -211,8 +244,6 @@ void run() {
     status = clSetKernelArg(kernel[i], argi++, sizeof(cl_mem), &input_a_buf[i]);
     checkError(status, "Failed to set argument %d", argi - 1);
 
-    status = clSetKernelArg(kernel[i], argi++, sizeof(cl_mem), &input_b_buf[i]);
-    checkError(status, "Failed to set argument %d", argi - 1);
 
     status = clSetKernelArg(kernel[i], argi++, sizeof(cl_mem), &output_buf[i]);
     checkError(status, "Failed to set argument %d", argi - 1);
@@ -226,21 +257,25 @@ void run() {
     // work-size).
     //
     // Events are used to ensure that the kernel is not launched until
+    
+    size_t global_work_size[2];
     // the writes to the input buffers have completed.
-    const size_t global_work_size = n_per_device[i];
+    // const size_t global_work_size[2] = {sqrt(n_per_device[i]),sqrt(n_per_device[i])};
+    
+    global_work_size[0]=1024;
+    global_work_size[1]=1024;
     printf("Launching for device %d (%d elements)\n", i, global_work_size);
 
-    status = clEnqueueNDRangeKernel(queue[i], kernel[i], 1, NULL,
-        &global_work_size, NULL, 2, write_event, &kernel_event[i]);
+    status = clEnqueueNDRangeKernel(queue[i], kernel[i], 2, NULL,
+        global_work_size, NULL, 2, write_event, &kernel_event[i]); //passe para 0 caso n funcione
     checkError(status, "Failed to launch kernel");
 
     // Read the result. This the final operation.
     status = clEnqueueReadBuffer(queue[i], output_buf[i], CL_FALSE,
-        0, n_per_device[i] * sizeof(float), output[i], 1, &kernel_event[i], &finish_event[i]);
+        0, n_per_device[i] * sizeof(unsigned char), output[i], 1, &kernel_event[i], &finish_event[i]);
 
     // Release local events.
     clReleaseEvent(write_event[0]);
-    clReleaseEvent(write_event[1]);
   }
 
   // Wait for all devices to finish.
@@ -289,9 +324,6 @@ void cleanup() {
     }
     if(input_a_buf && input_a_buf[i]) {
       clReleaseMemObject(input_a_buf[i]);
-    }
-    if(input_b_buf && input_b_buf[i]) {
-      clReleaseMemObject(input_b_buf[i]);
     }
     if(output_buf && output_buf[i]) {
       clReleaseMemObject(output_buf[i]);

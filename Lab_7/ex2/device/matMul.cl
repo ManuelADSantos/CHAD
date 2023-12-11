@@ -1,0 +1,19 @@
+// ACL kernel for multiply 2  matrix
+__kernel void matMul(__global const float *A, 
+                        __global const float *B, 
+                        __global float *restrict C)
+{
+    // get index of the work item
+    int row = get_global_id(1);
+    int col = get_global_id(0);
+
+   if ( (row  < 1024) && (col  < 1024)){
+       float sum = 0.0;
+       for(int k=0;k<1024;k++)
+           sum += A[row*1024+k] * B[k*1024+col];
+       C[row*1024+col] = sum;
+   }
+}
+
+
+
