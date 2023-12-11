@@ -1,0 +1,30 @@
+============ Exercise 2.1 ==========
+(5*10^3) Elementos
+Sequential: 0.079434 ms
+Parallel:   13.72945 ms
+
+(5*10^5) Elementos
+Sequential: 1.923914 ms
+Parallel:   147.30116 ms
+
+(5*10^7) Elementos
+Sequential: 195.071309 ms
+Parallel:   399.15908 ms
+
+Tempo de API bem maior
+
+
+============ Exercise 3_1 ==========
+1000 x 1000
+Sequential: 4956.821578 ms
+Parallel:   1642.36	ms
+
+
+============ Exercise 3_3 ==========
+1000 x 1000
+Sequential: 4956.821578 ms
+Parallel:   195.5289	ms
+
+A copiar para o kernel, o OpenACC tenta adivinhar o tamanho das matrizes
+
+dominar o parallel, o loop, o data, o copy
