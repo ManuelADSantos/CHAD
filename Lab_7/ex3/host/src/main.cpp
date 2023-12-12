@@ -34,6 +34,12 @@ scoped_array<scoped_aligned_ptr<unsigned char> > output; // num_devices elements
 scoped_array<scoped_array<unsigned char> > ref_output; // num_devices elements
 scoped_array<unsigned> n_per_device; // num_devices elements
 
+// Check input_a contains the correct values.
+for (unsigned i = 0; i < N; ++i) 
+{
+  printf("%d ", input_a[i]);
+}
+
 // Function prototypes
 bool init_opencl();
 void init_problem();
