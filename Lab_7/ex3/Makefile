@@ -38,7 +38,7 @@ AOCL_LINK_CONFIG=$(shell aocl link-config --arm)
 
 # Make it all!
 all : 
-	$(CROSS-COMPILE)g++ $(SRCS_FILES) $(COMMON_FILES) -o $(TARGET)  $(AOCL_COMPILE_CONFIG) $(AOCL_LINK_CONFIG)
+	$(CROSS-COMPILE)g++ -g $(SRCS_FILES) $(COMMON_FILES) -o $(TARGET)  $(AOCL_COMPILE_CONFIG) $(AOCL_LINK_CONFIG)
 
 
 # Standard make targets

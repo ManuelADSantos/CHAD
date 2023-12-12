@@ -41,8 +41,8 @@ aoc device/GreyScale.cl --profile -v --report --sw-dimm-partition -o bin/GreySca
 
 ///////////////////////// Send to FPGA /////////////////////////
 ======================(From host to FPGA)======================
-send >>GreyScale<< (executable) to FPGA
-send >>bin/GreyScale.aocx<< (kernel) to FPGA
+put >>GreyScale<< (executable) to FPGA
+put >>bin/GreyScale.aocx<< (kernel) to FPGA
 
 
 ///////////////////////// Run on FPGA ///////////////////////// 

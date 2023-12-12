@@ -34,12 +34,6 @@ scoped_array<scoped_aligned_ptr<unsigned char> > output; // num_devices elements
 scoped_array<scoped_array<unsigned char> > ref_output; // num_devices elements
 scoped_array<unsigned> n_per_device; // num_devices elements
 
-// Check input_a contains the correct values.
-for (unsigned i = 0; i < N; ++i) 
-{
-  printf("%d ", input_a[i]);
-}
-
 // Function prototypes
 bool init_opencl();
 void init_problem();
@@ -146,7 +140,9 @@ bool init_opencl() {
         n_per_device[i] * sizeof(unsigned char), NULL, &status);
     checkError(status, "Failed to create buffer for output");
   }
-
+    
+  printf("init_opencl function was sucessfull\n");
+    
   return true;
 }
 
@@ -159,7 +155,9 @@ void init_problem() {
   input_a.reset(num_devices);
   output.reset(num_devices);
   ref_output.reset(num_devices);
-
+    
+  //printf("Cheguei aqui 1\n");
+  
   // Generate input vectors A and B and the reference output consisting
   // of a total of N elements.
   // We create separate arrays for each device so that each device has an
@@ -168,12 +166,22 @@ void init_problem() {
     input_a[i].reset(n_per_device[i]);
     output[i].reset(n_per_device[i]);
     ref_output[i].reset(n_per_device[i]);
-
-    for(unsigned j = 0; j < n_per_device[i]*3; ++j) {
-      input_a[i][j] = 2;
+    
+    printf("Dados | num_devices = %d\n", num_devices);
+    
+    // Popular matriz
+    for(unsigned j = 0; j < n_per_device[i]; ++j) {
+        //printf("Entrou\n");
+      input_a[i][3*j+0] = (unsigned char)1;
+      //printf("Red done\n");
+      input_a[i][3*j+1] = (unsigned char)2;
+      input_a[i][3*j+2] = (unsigned char)3;
+      
+      if(j <10)
+        printf("Device %d | Iter %d\n", i, j);
     }
 
-
+    printf("Cheguei aqui 2\n");
   for(unsigned ii = 0; ii < n_per_device[i]; ++ii) {
     output[i].reset(n_per_device[i]);
     ref_output[i].reset(n_per_device[i]);
@@ -192,7 +200,14 @@ void init_problem() {
 		ref_output[i][ii] = r*0.21f+g*0.71f+b*0.07f; //3 channels cada soma é channel
 	  }
   }
+  
+  // Check input_a contains the correct values.
+    for (int i = 0; i < N; ++i) 
+    {
+        printf("r = %d | g = %d | b = %d\n", input_a[i][3*i], input_a[i][3*i+1], input_a[i][3*i+2]);
+    }
 
+    printf("init_problem function was sucessfull\n");
 
   }
 }
