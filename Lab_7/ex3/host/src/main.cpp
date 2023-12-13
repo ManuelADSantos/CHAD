@@ -12,6 +12,11 @@
 #include <math.h>
 #include "CL/opencl.h"
 #include "AOCL_Utils.h"
+// Image read libraries
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "lib/stb_image.h"
+#include "lib/stb_image_write.h"
 
 
 using namespace aocl_utils;
@@ -43,7 +48,8 @@ void cleanup();
 // Entry point.
 int main() {
   // Initialize OpenCL.
-  if(!init_opencl()) {
+  if(!init_opencl()) 
+  {
     return -1;
   }
 
