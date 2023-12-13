@@ -8,16 +8,16 @@
 // ============================================================================
 
 // Image read libraries
-#define STB_IMAGE_IMPLEMENTATION
+/*#define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 /*#define STBI_MALLOC
 #define STBI_REALLOC
-#define STBI_FREE */
+#define STBI_FREE 
 #define STBI_MSC_SECURE_CRT
-#define STBI_ONLY_JPEG
+#define STBI_ONLY_JPEG*/
 
-#include "lib/stb_image.h"
-#include "lib/stb_image_write.h"
+/*include "lib/stb_image.h"
+#include "lib/stb_image_write.h"*/
 // OpenCL libraries
 #include "CL/opencl.h"
 #include "AOCL_Utils.h"
@@ -57,6 +57,7 @@ scoped_array<unsigned> n_per_device; // num_devices elements
 
 // Function prototypes
 bool init_opencl();
+float rand_float();
 void init_problem();
 void run();
 void cleanup();
@@ -73,7 +74,6 @@ int main()
   // Initialize the problem data.
   // Requires the number of devices to be known.
   init_problem();
-  return 0;
 
   // Run the kernel.
   run();
@@ -85,6 +85,12 @@ int main()
 }
 
 /////// HELPER FUNCTIONS ///////
+// Randomly generate a floating-point number between -10 and 10.
+unsigned char rand_char()
+{
+  int x = rand() % 255;
+  return (unsigned char)x;
+}
 
 // Initializes the OpenCL objects.
 bool init_opencl()
@@ -179,14 +185,14 @@ void init_problem()
   host_img_gray.reset(num_devices);
   
   // ===== Image Properties
-  int width, height, n;
-  unsigned char *img_rgb_object = stbi_load("image.jpg", &width, &height, &n, 0);
+  //int width, height, n;
+  //unsigned char *img_rgb_object = stbi_load("image.jpg", &width, &height, &n, 0);
 
-  if (img_rgb_object == NULL)
+  /*if (img_rgb_object == NULL)
   {
       printf("Error in loading the image\n");
       exit(1);
-  }
+  }*/
 
 
   // Generate input vectors A and B and the reference output consisting
@@ -206,12 +212,15 @@ void init_problem()
       //printf("Entrou\n");
       
       //printf("Red done\n");
-      host_img_rgb[i][3*j+0] = img_rgb_object[i*n_per_device[i] + (3*j+0)];
+      //host_img_rgb[i][3*j+0] = img_rgb_object[i*n_per_device[i] + (3*j+0)];
+      host_img_rgb[i][3*j+0] = rand_char();
       //printf("R = %d\n", host_img_rgb[i][3*j+0]);
       //printf("Green done\n");
-      host_img_rgb[i][3*j+1] = img_rgb_object[i*n_per_device[i] + (3*j+1)];
+      //host_img_rgb[i][3*j+1] = img_rgb_object[i*n_per_device[i] + (3*j+1)];
+      host_img_rgb[i][3*j+0] = rand_char();
       //printf("Blue done\n");
-      host_img_rgb[i][3*j+2] = img_rgb_object[i*n_per_device[i] + (3*j+2)];
+      //host_img_rgb[i][3*j+2] = img_rgb_object[i*n_per_device[i] + (3*j+2)];
+      host_img_rgb[i][3*j+0] = rand_char();
       //printf("Pixel %d = %d %d %d\n", j, host_img_rgb[i][3*j+0], host_img_rgb[i][3*j+1], host_img_rgb[i][3*j+2]);
       
     }
@@ -221,10 +230,7 @@ void init_problem()
 
   //unsigned char *img_gray_object = stbi_load("image.jpg", &width, &height, &n, 0);
 
-  //printf("Size of host_img_rgb[0] = %d\n", sizeof(host_img_rgb[0]));
-
-  exit(1);
-  
+  //printf("Size of host_img_rgb[0] = %d\n", sizeof(host_img_rgb[0]));  
 }
 
 // This function is used to verify the results.
@@ -274,21 +280,26 @@ void run()
     //
     // Events are used to ensure that the kernel is not launched until
     
-    size_t global_work_size[2];
+    size_t global_work_size[1];
     // the writes to the input buffers have completed.
     // const size_t global_work_size[2] = {sqrt(n_per_device[i]),sqrt(n_per_device[i])};
     
-    global_work_size[0]=1024;
-    global_work_size[1]=1024;
+    global_work_size[0]=N;
     printf("Launching for device %d (%d elements)\n", i, global_work_size);
 
-    status = clEnqueueNDRangeKernel(queue[i], kernel[i], 2, NULL, global_work_size, NULL, 2, write_event, &kernel_event[i]); //passe para 0 caso n funcione
+    status = clEnqueueNDRangeKernel(queue[i], kernel[i], 1, NULL, 
+                                    global_work_size, NULL, 2, write_event, 
+                                    &kernel_event[i]); //passe para 0 caso n funcione
     checkError(status, "Failed to launch kernel");
 
     // Read the result. This the final operation.
-    status = clEnqueueReadBuffer(queue[i], buffer_img_GRAY[i], CL_FALSE, 0, n_per_device[i] * sizeof(unsigned char), host_img_gray[i], 1, &kernel_event[i], &finish_event[i]);
-
+    status = clEnqueueReadBuffer(queue[i], buffer_img_GRAY[i], CL_FALSE, 0, 
+                                n_per_device[i] * sizeof(unsigned char), 
+                                host_img_gray[i], 1, &kernel_event[i], 
+                                &finish_event[i]);
+  
     // Release local events.
+    printf("Releasing local events\n");
     clReleaseEvent(write_event[0]);
   }
 

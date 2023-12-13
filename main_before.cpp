@@ -255,7 +255,7 @@ void run() {
     //
     // Events are used to ensure that the kernel is not launched until
     
-    size_t global_work_size[2];
+    size_t global_work_size[1];
     // the writes to the input buffers have completed.
     // const size_t global_work_size[2] = {sqrt(n_per_device[i]),sqrt(n_per_device[i])};
     
@@ -264,12 +264,15 @@ void run() {
     printf("Launching for device %d (%d elements)\n", i, global_work_size);
 
     status = clEnqueueNDRangeKernel(queue[i], kernel[i], 2, NULL,
-        global_work_size, NULL, 2, write_event, &kernel_event[i]); //passe para 0 caso n funcione
+                                    global_work_size, NULL, 2, write_event, 
+                                    &kernel_event[i]); //passe para 0 caso n funcione
     checkError(status, "Failed to launch kernel");
 
     // Read the result. This the final operation.
-    status = clEnqueueReadBuffer(queue[i], output_buf[i], CL_FALSE,
-        0, n_per_device[i] * sizeof(unsigned char), output[i], 1, &kernel_event[i], &finish_event[i]);
+    status = clEnqueueReadBuffer(queue[i], output_buf[i], CL_FALSE, 0, 
+                                n_per_device[i] * sizeof(unsigned char), 
+                                output[i], 1, &kernel_event[i], 
+                                &finish_event[i]);
 
     // Release local events.
     clReleaseEvent(write_event[0]);
