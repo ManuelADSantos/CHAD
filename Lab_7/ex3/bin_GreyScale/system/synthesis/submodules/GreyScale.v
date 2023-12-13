@@ -25,11 +25,9 @@ module GreyScale_basic_block_0
 		input 		valid_in,
 		output 		stall_out,
 		input [31:0] 		input_global_id_0,
-		input [31:0] 		input_global_id_1,
 		output 		valid_out,
 		input 		stall_in,
 		output [31:0] 		lvb_input_global_id_0,
-		output [31:0] 		lvb_input_global_id_1,
 		input [31:0] 		workgroup_size
 	);
 
@@ -74,9 +72,7 @@ wire merge_stalled_by_successors;
  reg merge_block_selector_NO_SHIFT_REG;
  reg merge_node_valid_in_staging_reg_NO_SHIFT_REG;
  reg [31:0] input_global_id_0_staging_reg_NO_SHIFT_REG;
- reg [31:0] input_global_id_1_staging_reg_NO_SHIFT_REG;
  reg [31:0] local_lvm_input_global_id_0_NO_SHIFT_REG;
- reg [31:0] local_lvm_input_global_id_1_NO_SHIFT_REG;
  reg is_merge_data_to_local_regs_valid_NO_SHIFT_REG;
  reg invariant_valid_NO_SHIFT_REG;
 
@@ -102,7 +98,6 @@ begin
 	if (~(resetn))
 	begin
 		input_global_id_0_staging_reg_NO_SHIFT_REG <= 'x;
-		input_global_id_1_staging_reg_NO_SHIFT_REG <= 'x;
 		merge_node_valid_in_staging_reg_NO_SHIFT_REG <= 1'b0;
 	end
 	else
@@ -112,7 +107,6 @@ begin
 			if (~(merge_node_valid_in_staging_reg_NO_SHIFT_REG))
 			begin
 				input_global_id_0_staging_reg_NO_SHIFT_REG <= input_global_id_0;
-				input_global_id_1_staging_reg_NO_SHIFT_REG <= input_global_id_1;
 				merge_node_valid_in_staging_reg_NO_SHIFT_REG <= valid_in;
 			end
 		end
@@ -133,12 +127,10 @@ begin
 				if (merge_node_valid_in_staging_reg_NO_SHIFT_REG)
 				begin
 					local_lvm_input_global_id_0_NO_SHIFT_REG <= input_global_id_0_staging_reg_NO_SHIFT_REG;
-					local_lvm_input_global_id_1_NO_SHIFT_REG <= input_global_id_1_staging_reg_NO_SHIFT_REG;
 				end
 				else
 				begin
 					local_lvm_input_global_id_0_NO_SHIFT_REG <= input_global_id_0;
-					local_lvm_input_global_id_1_NO_SHIFT_REG <= input_global_id_1;
 				end
 			end
 
@@ -191,13 +183,11 @@ wire branch_var__inputs_ready;
 wire branch_var__output_regs_ready;
 wire combined_branch_stall_in_signal;
  reg [31:0] lvb_input_global_id_0_reg_NO_SHIFT_REG;
- reg [31:0] lvb_input_global_id_1_reg_NO_SHIFT_REG;
 
 assign branch_var__inputs_ready = merge_node_valid_out_NO_SHIFT_REG;
 assign branch_var__output_regs_ready = (~(stall_in) | ~(branch_node_valid_out_NO_SHIFT_REG));
 assign merge_node_stall_in = (~(branch_var__output_regs_ready) | ~(branch_var__inputs_ready));
 assign lvb_input_global_id_0 = lvb_input_global_id_0_reg_NO_SHIFT_REG;
-assign lvb_input_global_id_1 = lvb_input_global_id_1_reg_NO_SHIFT_REG;
 assign valid_out = branch_node_valid_out_NO_SHIFT_REG;
 assign combined_branch_stall_in_signal = stall_in;
 
@@ -207,7 +197,6 @@ begin
 	begin
 		branch_node_valid_out_NO_SHIFT_REG <= 1'b0;
 		lvb_input_global_id_0_reg_NO_SHIFT_REG <= 'x;
-		lvb_input_global_id_1_reg_NO_SHIFT_REG <= 'x;
 	end
 	else
 	begin
@@ -215,7 +204,6 @@ begin
 		begin
 			branch_node_valid_out_NO_SHIFT_REG <= branch_var__inputs_ready;
 			lvb_input_global_id_0_reg_NO_SHIFT_REG <= local_lvm_input_global_id_0_NO_SHIFT_REG;
-			lvb_input_global_id_1_reg_NO_SHIFT_REG <= local_lvm_input_global_id_1_NO_SHIFT_REG;
 		end
 		else
 		begin
@@ -242,10 +230,10 @@ module GreyScale_basic_block_1
 		input 		resetn,
 		input [63:0] 		input_grayImage,
 		input [63:0] 		input_rgbImage,
+		input [31:0] 		input_global_size_0,
 		input 		valid_in,
 		output 		stall_out,
 		input [31:0] 		input_global_id_0,
-		input [31:0] 		input_global_id_1,
 		output 		valid_out,
 		input 		stall_in,
 		input [31:0] 		workgroup_size,
@@ -263,7 +251,6 @@ module GreyScale_basic_block_1
 		output 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_cntl,
 		output [31:0] 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_incr,
 		output 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_ivalid_cntl,
-		output 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_req_cntl,
 		output 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_readwrite_count_cntl,
 		output 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_cntl,
 		output [31:0] 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_incr,
@@ -284,7 +271,6 @@ module GreyScale_basic_block_1
 		output 		profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl,
 		output [31:0] 		profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr,
 		output 		profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl,
-		output 		profile_lsu_local_bb1_st_c0_exe1_profile_total_req_cntl,
 		output 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl,
 		output 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl,
 		output [31:0] 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr,
@@ -333,19 +319,15 @@ wire merge_node_stall_in_1;
  reg merge_node_valid_out_1_NO_SHIFT_REG;
 wire merge_node_stall_in_2;
  reg merge_node_valid_out_2_NO_SHIFT_REG;
-wire merge_node_stall_in_3;
- reg merge_node_valid_out_3_NO_SHIFT_REG;
 wire merge_stalled_by_successors;
  reg merge_block_selector_NO_SHIFT_REG;
  reg merge_node_valid_in_staging_reg_NO_SHIFT_REG;
  reg [31:0] input_global_id_0_staging_reg_NO_SHIFT_REG;
- reg [31:0] input_global_id_1_staging_reg_NO_SHIFT_REG;
  reg [31:0] local_lvm_input_global_id_0_NO_SHIFT_REG;
- reg [31:0] local_lvm_input_global_id_1_NO_SHIFT_REG;
  reg is_merge_data_to_local_regs_valid_NO_SHIFT_REG;
  reg invariant_valid_NO_SHIFT_REG;
 
-assign merge_stalled_by_successors = ((merge_node_stall_in_0 & merge_node_valid_out_0_NO_SHIFT_REG) | (merge_node_stall_in_1 & merge_node_valid_out_1_NO_SHIFT_REG) | (merge_node_stall_in_2 & merge_node_valid_out_2_NO_SHIFT_REG) | (merge_node_stall_in_3 & merge_node_valid_out_3_NO_SHIFT_REG));
+assign merge_stalled_by_successors = ((merge_node_stall_in_0 & merge_node_valid_out_0_NO_SHIFT_REG) | (merge_node_stall_in_1 & merge_node_valid_out_1_NO_SHIFT_REG) | (merge_node_stall_in_2 & merge_node_valid_out_2_NO_SHIFT_REG));
 assign stall_out = merge_node_valid_in_staging_reg_NO_SHIFT_REG;
 
 always @(*)
@@ -367,7 +349,6 @@ begin
 	if (~(resetn))
 	begin
 		input_global_id_0_staging_reg_NO_SHIFT_REG <= 'x;
-		input_global_id_1_staging_reg_NO_SHIFT_REG <= 'x;
 		merge_node_valid_in_staging_reg_NO_SHIFT_REG <= 1'b0;
 	end
 	else
@@ -377,7 +358,6 @@ begin
 			if (~(merge_node_valid_in_staging_reg_NO_SHIFT_REG))
 			begin
 				input_global_id_0_staging_reg_NO_SHIFT_REG <= input_global_id_0;
-				input_global_id_1_staging_reg_NO_SHIFT_REG <= input_global_id_1;
 				merge_node_valid_in_staging_reg_NO_SHIFT_REG <= valid_in;
 			end
 		end
@@ -398,12 +378,10 @@ begin
 				if (merge_node_valid_in_staging_reg_NO_SHIFT_REG)
 				begin
 					local_lvm_input_global_id_0_NO_SHIFT_REG <= input_global_id_0_staging_reg_NO_SHIFT_REG;
-					local_lvm_input_global_id_1_NO_SHIFT_REG <= input_global_id_1_staging_reg_NO_SHIFT_REG;
 				end
 				else
 				begin
 					local_lvm_input_global_id_0_NO_SHIFT_REG <= input_global_id_0;
-					local_lvm_input_global_id_1_NO_SHIFT_REG <= input_global_id_1;
 				end
 			end
 
@@ -422,7 +400,6 @@ begin
 		merge_node_valid_out_0_NO_SHIFT_REG <= 1'b0;
 		merge_node_valid_out_1_NO_SHIFT_REG <= 1'b0;
 		merge_node_valid_out_2_NO_SHIFT_REG <= 1'b0;
-		merge_node_valid_out_3_NO_SHIFT_REG <= 1'b0;
 	end
 	else
 	begin
@@ -431,7 +408,6 @@ begin
 			merge_node_valid_out_0_NO_SHIFT_REG <= is_merge_data_to_local_regs_valid_NO_SHIFT_REG;
 			merge_node_valid_out_1_NO_SHIFT_REG <= is_merge_data_to_local_regs_valid_NO_SHIFT_REG;
 			merge_node_valid_out_2_NO_SHIFT_REG <= is_merge_data_to_local_regs_valid_NO_SHIFT_REG;
-			merge_node_valid_out_3_NO_SHIFT_REG <= is_merge_data_to_local_regs_valid_NO_SHIFT_REG;
 		end
 		else
 		begin
@@ -446,10 +422,6 @@ begin
 			if (~(merge_node_stall_in_2))
 			begin
 				merge_node_valid_out_2_NO_SHIFT_REG <= 1'b0;
-			end
-			if (~(merge_node_stall_in_3))
-			begin
-				merge_node_valid_out_3_NO_SHIFT_REG <= 1'b0;
 			end
 		end
 	end
@@ -470,387 +442,219 @@ end
 
 // This section implements an unregistered operation.
 // 
-wire local_bb1_mul_stall_local;
-wire [31:0] local_bb1_mul;
-
-assign local_bb1_mul = (local_lvm_input_global_id_1_NO_SHIFT_REG << 32'hA);
-
-// This section implements an unregistered operation.
-// 
-wire local_bb1_notlhs_stall_local;
-wire local_bb1_notlhs;
-
-assign local_bb1_notlhs = ($signed(local_lvm_input_global_id_0_NO_SHIFT_REG) > $signed(32'h3FF));
-
-// This section implements an unregistered operation.
-// 
-wire local_bb1_notrhs_stall_local;
-wire local_bb1_notrhs;
-
-assign local_bb1_notrhs = ($signed(local_lvm_input_global_id_1_NO_SHIFT_REG) > $signed(32'h3FF));
-
-// This section implements an unregistered operation.
-// 
-wire local_bb1_add_stall_local;
-wire [31:0] local_bb1_add;
-
-assign local_bb1_add = (local_bb1_mul + local_lvm_input_global_id_0_NO_SHIFT_REG);
-
-// This section implements an unregistered operation.
-// 
-wire local_bb1_or_cond_xor_valid_out;
-wire local_bb1_or_cond_xor_stall_in;
-wire local_bb1_or_cond_xor_inputs_ready;
-wire local_bb1_or_cond_xor_stall_local;
-wire local_bb1_or_cond_xor;
-
-assign local_bb1_or_cond_xor_inputs_ready = (merge_node_valid_out_1_NO_SHIFT_REG & merge_node_valid_out_2_NO_SHIFT_REG);
-assign local_bb1_or_cond_xor = (local_bb1_notrhs | local_bb1_notlhs);
-assign local_bb1_or_cond_xor_valid_out = local_bb1_or_cond_xor_inputs_ready;
-assign local_bb1_or_cond_xor_stall_local = local_bb1_or_cond_xor_stall_in;
-assign merge_node_stall_in_1 = (local_bb1_or_cond_xor_stall_local | ~(local_bb1_or_cond_xor_inputs_ready));
-assign merge_node_stall_in_2 = (local_bb1_or_cond_xor_stall_local | ~(local_bb1_or_cond_xor_inputs_ready));
-
-// This section implements an unregistered operation.
-// 
 wire local_bb1_var__stall_local;
 wire [31:0] local_bb1_var_;
 
-assign local_bb1_var_ = (local_bb1_add << 32'h1);
-
-// Register node:
-//  * latency = 1
-//  * capacity = 1
- logic rnode_1to2_bb1_or_cond_xor_0_valid_out_0_NO_SHIFT_REG;
- logic rnode_1to2_bb1_or_cond_xor_0_stall_in_0_NO_SHIFT_REG;
- logic rnode_1to2_bb1_or_cond_xor_0_NO_SHIFT_REG;
- logic rnode_1to2_bb1_or_cond_xor_0_valid_out_1_NO_SHIFT_REG;
- logic rnode_1to2_bb1_or_cond_xor_0_stall_in_1_NO_SHIFT_REG;
- logic rnode_1to2_bb1_or_cond_xor_1_NO_SHIFT_REG;
- logic rnode_1to2_bb1_or_cond_xor_0_reg_2_inputs_ready_NO_SHIFT_REG;
- logic rnode_1to2_bb1_or_cond_xor_0_reg_2_NO_SHIFT_REG;
- logic rnode_1to2_bb1_or_cond_xor_0_valid_out_0_reg_2_NO_SHIFT_REG;
- logic rnode_1to2_bb1_or_cond_xor_0_stall_in_0_reg_2_NO_SHIFT_REG;
- logic rnode_1to2_bb1_or_cond_xor_0_stall_out_reg_2_NO_SHIFT_REG;
- logic rnode_1to2_bb1_or_cond_xor_0_reg_2_NO_SHIFT_REG_fa;
-
-acl_multi_fanout_adaptor rnode_1to2_bb1_or_cond_xor_0_reg_2_fanout_adaptor (
-	.clock(clock),
-	.resetn(resetn),
-	.data_in(rnode_1to2_bb1_or_cond_xor_0_reg_2_NO_SHIFT_REG),
-	.valid_in(rnode_1to2_bb1_or_cond_xor_0_valid_out_0_reg_2_NO_SHIFT_REG),
-	.stall_out(rnode_1to2_bb1_or_cond_xor_0_stall_in_0_reg_2_NO_SHIFT_REG),
-	.data_out(rnode_1to2_bb1_or_cond_xor_0_reg_2_NO_SHIFT_REG_fa),
-	.valid_out({rnode_1to2_bb1_or_cond_xor_0_valid_out_0_NO_SHIFT_REG, rnode_1to2_bb1_or_cond_xor_0_valid_out_1_NO_SHIFT_REG}),
-	.stall_in({rnode_1to2_bb1_or_cond_xor_0_stall_in_0_NO_SHIFT_REG, rnode_1to2_bb1_or_cond_xor_0_stall_in_1_NO_SHIFT_REG})
-);
-
-defparam rnode_1to2_bb1_or_cond_xor_0_reg_2_fanout_adaptor.DATA_WIDTH = 1;
-defparam rnode_1to2_bb1_or_cond_xor_0_reg_2_fanout_adaptor.NUM_FANOUTS = 2;
-
-acl_data_fifo rnode_1to2_bb1_or_cond_xor_0_reg_2_fifo (
-	.clock(clock),
-	.resetn(resetn),
-	.valid_in(rnode_1to2_bb1_or_cond_xor_0_reg_2_inputs_ready_NO_SHIFT_REG),
-	.stall_in(rnode_1to2_bb1_or_cond_xor_0_stall_in_0_reg_2_NO_SHIFT_REG),
-	.valid_out(rnode_1to2_bb1_or_cond_xor_0_valid_out_0_reg_2_NO_SHIFT_REG),
-	.stall_out(rnode_1to2_bb1_or_cond_xor_0_stall_out_reg_2_NO_SHIFT_REG),
-	.data_in(local_bb1_or_cond_xor),
-	.data_out(rnode_1to2_bb1_or_cond_xor_0_reg_2_NO_SHIFT_REG)
-);
-
-defparam rnode_1to2_bb1_or_cond_xor_0_reg_2_fifo.DEPTH = 2;
-defparam rnode_1to2_bb1_or_cond_xor_0_reg_2_fifo.DATA_WIDTH = 1;
-defparam rnode_1to2_bb1_or_cond_xor_0_reg_2_fifo.ALLOW_FULL_WRITE = 0;
-defparam rnode_1to2_bb1_or_cond_xor_0_reg_2_fifo.IMPL = "ll_reg";
-
-assign rnode_1to2_bb1_or_cond_xor_0_reg_2_inputs_ready_NO_SHIFT_REG = local_bb1_or_cond_xor_valid_out;
-assign local_bb1_or_cond_xor_stall_in = rnode_1to2_bb1_or_cond_xor_0_stall_out_reg_2_NO_SHIFT_REG;
-assign rnode_1to2_bb1_or_cond_xor_0_NO_SHIFT_REG = rnode_1to2_bb1_or_cond_xor_0_reg_2_NO_SHIFT_REG_fa;
-assign rnode_1to2_bb1_or_cond_xor_1_NO_SHIFT_REG = rnode_1to2_bb1_or_cond_xor_0_reg_2_NO_SHIFT_REG_fa;
-
-// This section implements an unregistered operation.
-// 
-wire local_bb1_add_valid_out_2;
-wire local_bb1_add_stall_in_2;
- reg local_bb1_add_consumed_2_NO_SHIFT_REG;
-wire local_bb1_mul6_add62_valid_out;
-wire local_bb1_mul6_add62_stall_in;
- reg local_bb1_mul6_add62_consumed_0_NO_SHIFT_REG;
-wire local_bb1_mul6_add62_inputs_ready;
-wire local_bb1_mul6_add62_stall_local;
-wire [31:0] local_bb1_mul6_add62;
-
-assign local_bb1_mul6_add62_inputs_ready = (merge_node_valid_out_0_NO_SHIFT_REG & merge_node_valid_out_3_NO_SHIFT_REG);
-assign local_bb1_mul6_add62 = (local_bb1_add + local_bb1_var_);
-assign local_bb1_mul6_add62_stall_local = ((local_bb1_add_stall_in_2 & ~(local_bb1_add_consumed_2_NO_SHIFT_REG)) | (local_bb1_mul6_add62_stall_in & ~(local_bb1_mul6_add62_consumed_0_NO_SHIFT_REG)));
-assign local_bb1_add_valid_out_2 = (local_bb1_mul6_add62_inputs_ready & ~(local_bb1_add_consumed_2_NO_SHIFT_REG));
-assign local_bb1_mul6_add62_valid_out = (local_bb1_mul6_add62_inputs_ready & ~(local_bb1_mul6_add62_consumed_0_NO_SHIFT_REG));
-assign merge_node_stall_in_0 = (local_bb1_mul6_add62_stall_local | ~(local_bb1_mul6_add62_inputs_ready));
-assign merge_node_stall_in_3 = (local_bb1_mul6_add62_stall_local | ~(local_bb1_mul6_add62_inputs_ready));
-
-always @(posedge clock or negedge resetn)
-begin
-	if (~(resetn))
-	begin
-		local_bb1_add_consumed_2_NO_SHIFT_REG <= 1'b0;
-		local_bb1_mul6_add62_consumed_0_NO_SHIFT_REG <= 1'b0;
-	end
-	else
-	begin
-		local_bb1_add_consumed_2_NO_SHIFT_REG <= (local_bb1_mul6_add62_inputs_ready & (local_bb1_add_consumed_2_NO_SHIFT_REG | ~(local_bb1_add_stall_in_2)) & local_bb1_mul6_add62_stall_local);
-		local_bb1_mul6_add62_consumed_0_NO_SHIFT_REG <= (local_bb1_mul6_add62_inputs_ready & (local_bb1_mul6_add62_consumed_0_NO_SHIFT_REG | ~(local_bb1_mul6_add62_stall_in)) & local_bb1_mul6_add62_stall_local);
-	end
-end
-
-
-// Register node:
-//  * latency = 192
-//  * capacity = 192
- logic rnode_2to194_bb1_or_cond_xor_0_valid_out_NO_SHIFT_REG;
- logic rnode_2to194_bb1_or_cond_xor_0_stall_in_NO_SHIFT_REG;
- logic rnode_2to194_bb1_or_cond_xor_0_NO_SHIFT_REG;
- logic rnode_2to194_bb1_or_cond_xor_0_reg_194_inputs_ready_NO_SHIFT_REG;
- logic rnode_2to194_bb1_or_cond_xor_0_reg_194_NO_SHIFT_REG;
- logic rnode_2to194_bb1_or_cond_xor_0_valid_out_reg_194_NO_SHIFT_REG;
- logic rnode_2to194_bb1_or_cond_xor_0_stall_in_reg_194_NO_SHIFT_REG;
- logic rnode_2to194_bb1_or_cond_xor_0_stall_out_reg_194_NO_SHIFT_REG;
-
-acl_data_fifo rnode_2to194_bb1_or_cond_xor_0_reg_194_fifo (
-	.clock(clock),
-	.resetn(resetn),
-	.valid_in(rnode_2to194_bb1_or_cond_xor_0_reg_194_inputs_ready_NO_SHIFT_REG),
-	.stall_in(rnode_2to194_bb1_or_cond_xor_0_stall_in_reg_194_NO_SHIFT_REG),
-	.valid_out(rnode_2to194_bb1_or_cond_xor_0_valid_out_reg_194_NO_SHIFT_REG),
-	.stall_out(rnode_2to194_bb1_or_cond_xor_0_stall_out_reg_194_NO_SHIFT_REG),
-	.data_in(rnode_1to2_bb1_or_cond_xor_1_NO_SHIFT_REG),
-	.data_out(rnode_2to194_bb1_or_cond_xor_0_reg_194_NO_SHIFT_REG)
-);
-
-defparam rnode_2to194_bb1_or_cond_xor_0_reg_194_fifo.DEPTH = 193;
-defparam rnode_2to194_bb1_or_cond_xor_0_reg_194_fifo.DATA_WIDTH = 1;
-defparam rnode_2to194_bb1_or_cond_xor_0_reg_194_fifo.ALLOW_FULL_WRITE = 0;
-defparam rnode_2to194_bb1_or_cond_xor_0_reg_194_fifo.IMPL = "ram";
-
-assign rnode_2to194_bb1_or_cond_xor_0_reg_194_inputs_ready_NO_SHIFT_REG = rnode_1to2_bb1_or_cond_xor_0_valid_out_1_NO_SHIFT_REG;
-assign rnode_1to2_bb1_or_cond_xor_0_stall_in_1_NO_SHIFT_REG = rnode_2to194_bb1_or_cond_xor_0_stall_out_reg_194_NO_SHIFT_REG;
-assign rnode_2to194_bb1_or_cond_xor_0_NO_SHIFT_REG = rnode_2to194_bb1_or_cond_xor_0_reg_194_NO_SHIFT_REG;
-assign rnode_2to194_bb1_or_cond_xor_0_stall_in_reg_194_NO_SHIFT_REG = rnode_2to194_bb1_or_cond_xor_0_stall_in_NO_SHIFT_REG;
-assign rnode_2to194_bb1_or_cond_xor_0_valid_out_NO_SHIFT_REG = rnode_2to194_bb1_or_cond_xor_0_valid_out_reg_194_NO_SHIFT_REG;
+assign local_bb1_var_ = (local_lvm_input_global_id_0_NO_SHIFT_REG << 32'h1);
 
 // Register node:
 //  * latency = 193
 //  * capacity = 193
- logic rnode_1to194_bb1_add_0_valid_out_NO_SHIFT_REG;
- logic rnode_1to194_bb1_add_0_stall_in_NO_SHIFT_REG;
- logic [31:0] rnode_1to194_bb1_add_0_NO_SHIFT_REG;
- logic rnode_1to194_bb1_add_0_reg_194_inputs_ready_NO_SHIFT_REG;
- logic [31:0] rnode_1to194_bb1_add_0_reg_194_NO_SHIFT_REG;
- logic rnode_1to194_bb1_add_0_valid_out_reg_194_NO_SHIFT_REG;
- logic rnode_1to194_bb1_add_0_stall_in_reg_194_NO_SHIFT_REG;
- logic rnode_1to194_bb1_add_0_stall_out_reg_194_NO_SHIFT_REG;
+ logic rnode_1to194_input_global_id_0_0_valid_out_NO_SHIFT_REG;
+ logic rnode_1to194_input_global_id_0_0_stall_in_NO_SHIFT_REG;
+ logic [31:0] rnode_1to194_input_global_id_0_0_NO_SHIFT_REG;
+ logic rnode_1to194_input_global_id_0_0_reg_194_inputs_ready_NO_SHIFT_REG;
+ logic [31:0] rnode_1to194_input_global_id_0_0_reg_194_NO_SHIFT_REG;
+ logic rnode_1to194_input_global_id_0_0_valid_out_reg_194_NO_SHIFT_REG;
+ logic rnode_1to194_input_global_id_0_0_stall_in_reg_194_NO_SHIFT_REG;
+ logic rnode_1to194_input_global_id_0_0_stall_out_reg_194_NO_SHIFT_REG;
 
-acl_data_fifo rnode_1to194_bb1_add_0_reg_194_fifo (
+acl_data_fifo rnode_1to194_input_global_id_0_0_reg_194_fifo (
 	.clock(clock),
 	.resetn(resetn),
-	.valid_in(rnode_1to194_bb1_add_0_reg_194_inputs_ready_NO_SHIFT_REG),
-	.stall_in(rnode_1to194_bb1_add_0_stall_in_reg_194_NO_SHIFT_REG),
-	.valid_out(rnode_1to194_bb1_add_0_valid_out_reg_194_NO_SHIFT_REG),
-	.stall_out(rnode_1to194_bb1_add_0_stall_out_reg_194_NO_SHIFT_REG),
-	.data_in(local_bb1_add),
-	.data_out(rnode_1to194_bb1_add_0_reg_194_NO_SHIFT_REG)
+	.valid_in(rnode_1to194_input_global_id_0_0_reg_194_inputs_ready_NO_SHIFT_REG),
+	.stall_in(rnode_1to194_input_global_id_0_0_stall_in_reg_194_NO_SHIFT_REG),
+	.valid_out(rnode_1to194_input_global_id_0_0_valid_out_reg_194_NO_SHIFT_REG),
+	.stall_out(rnode_1to194_input_global_id_0_0_stall_out_reg_194_NO_SHIFT_REG),
+	.data_in(local_lvm_input_global_id_0_NO_SHIFT_REG),
+	.data_out(rnode_1to194_input_global_id_0_0_reg_194_NO_SHIFT_REG)
 );
 
-defparam rnode_1to194_bb1_add_0_reg_194_fifo.DEPTH = 194;
-defparam rnode_1to194_bb1_add_0_reg_194_fifo.DATA_WIDTH = 32;
-defparam rnode_1to194_bb1_add_0_reg_194_fifo.ALLOW_FULL_WRITE = 0;
-defparam rnode_1to194_bb1_add_0_reg_194_fifo.IMPL = "ram";
+defparam rnode_1to194_input_global_id_0_0_reg_194_fifo.DEPTH = 194;
+defparam rnode_1to194_input_global_id_0_0_reg_194_fifo.DATA_WIDTH = 32;
+defparam rnode_1to194_input_global_id_0_0_reg_194_fifo.ALLOW_FULL_WRITE = 0;
+defparam rnode_1to194_input_global_id_0_0_reg_194_fifo.IMPL = "ram";
 
-assign rnode_1to194_bb1_add_0_reg_194_inputs_ready_NO_SHIFT_REG = local_bb1_add_valid_out_2;
-assign local_bb1_add_stall_in_2 = rnode_1to194_bb1_add_0_stall_out_reg_194_NO_SHIFT_REG;
-assign rnode_1to194_bb1_add_0_NO_SHIFT_REG = rnode_1to194_bb1_add_0_reg_194_NO_SHIFT_REG;
-assign rnode_1to194_bb1_add_0_stall_in_reg_194_NO_SHIFT_REG = rnode_1to194_bb1_add_0_stall_in_NO_SHIFT_REG;
-assign rnode_1to194_bb1_add_0_valid_out_NO_SHIFT_REG = rnode_1to194_bb1_add_0_valid_out_reg_194_NO_SHIFT_REG;
+assign rnode_1to194_input_global_id_0_0_reg_194_inputs_ready_NO_SHIFT_REG = merge_node_valid_out_2_NO_SHIFT_REG;
+assign merge_node_stall_in_2 = rnode_1to194_input_global_id_0_0_stall_out_reg_194_NO_SHIFT_REG;
+assign rnode_1to194_input_global_id_0_0_NO_SHIFT_REG = rnode_1to194_input_global_id_0_0_reg_194_NO_SHIFT_REG;
+assign rnode_1to194_input_global_id_0_0_stall_in_reg_194_NO_SHIFT_REG = rnode_1to194_input_global_id_0_0_stall_in_NO_SHIFT_REG;
+assign rnode_1to194_input_global_id_0_0_valid_out_NO_SHIFT_REG = rnode_1to194_input_global_id_0_0_valid_out_reg_194_NO_SHIFT_REG;
+
+// This section implements an unregistered operation.
+// 
+wire local_bb1_mul_add62_valid_out;
+wire local_bb1_mul_add62_stall_in;
+wire local_bb1_mul_add62_inputs_ready;
+wire local_bb1_mul_add62_stall_local;
+wire [31:0] local_bb1_mul_add62;
+
+assign local_bb1_mul_add62_inputs_ready = (merge_node_valid_out_0_NO_SHIFT_REG & merge_node_valid_out_1_NO_SHIFT_REG);
+assign local_bb1_mul_add62 = (local_bb1_var_ + local_lvm_input_global_id_0_NO_SHIFT_REG);
+assign local_bb1_mul_add62_valid_out = local_bb1_mul_add62_inputs_ready;
+assign local_bb1_mul_add62_stall_local = local_bb1_mul_add62_stall_in;
+assign merge_node_stall_in_0 = (local_bb1_mul_add62_stall_local | ~(local_bb1_mul_add62_inputs_ready));
+assign merge_node_stall_in_1 = (local_bb1_mul_add62_stall_local | ~(local_bb1_mul_add62_inputs_ready));
 
 // Register node:
 //  * latency = 1
 //  * capacity = 1
- logic rnode_1to2_bb1_mul6_add62_0_valid_out_NO_SHIFT_REG;
- logic rnode_1to2_bb1_mul6_add62_0_stall_in_NO_SHIFT_REG;
- logic [31:0] rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG;
- logic rnode_1to2_bb1_mul6_add62_0_reg_2_inputs_ready_NO_SHIFT_REG;
- logic [31:0] rnode_1to2_bb1_mul6_add62_0_reg_2_NO_SHIFT_REG;
- logic rnode_1to2_bb1_mul6_add62_0_valid_out_reg_2_NO_SHIFT_REG;
- logic rnode_1to2_bb1_mul6_add62_0_stall_in_reg_2_NO_SHIFT_REG;
- logic rnode_1to2_bb1_mul6_add62_0_stall_out_reg_2_NO_SHIFT_REG;
+ logic rnode_194to195_input_global_id_0_0_valid_out_NO_SHIFT_REG;
+ logic rnode_194to195_input_global_id_0_0_stall_in_NO_SHIFT_REG;
+ logic [31:0] rnode_194to195_input_global_id_0_0_NO_SHIFT_REG;
+ logic rnode_194to195_input_global_id_0_0_reg_195_inputs_ready_NO_SHIFT_REG;
+ logic [31:0] rnode_194to195_input_global_id_0_0_reg_195_NO_SHIFT_REG;
+ logic rnode_194to195_input_global_id_0_0_valid_out_reg_195_NO_SHIFT_REG;
+ logic rnode_194to195_input_global_id_0_0_stall_in_reg_195_NO_SHIFT_REG;
+ logic rnode_194to195_input_global_id_0_0_stall_out_reg_195_NO_SHIFT_REG;
 
-acl_data_fifo rnode_1to2_bb1_mul6_add62_0_reg_2_fifo (
+acl_data_fifo rnode_194to195_input_global_id_0_0_reg_195_fifo (
 	.clock(clock),
 	.resetn(resetn),
-	.valid_in(rnode_1to2_bb1_mul6_add62_0_reg_2_inputs_ready_NO_SHIFT_REG),
-	.stall_in(rnode_1to2_bb1_mul6_add62_0_stall_in_reg_2_NO_SHIFT_REG),
-	.valid_out(rnode_1to2_bb1_mul6_add62_0_valid_out_reg_2_NO_SHIFT_REG),
-	.stall_out(rnode_1to2_bb1_mul6_add62_0_stall_out_reg_2_NO_SHIFT_REG),
-	.data_in(local_bb1_mul6_add62),
-	.data_out(rnode_1to2_bb1_mul6_add62_0_reg_2_NO_SHIFT_REG)
+	.valid_in(rnode_194to195_input_global_id_0_0_reg_195_inputs_ready_NO_SHIFT_REG),
+	.stall_in(rnode_194to195_input_global_id_0_0_stall_in_reg_195_NO_SHIFT_REG),
+	.valid_out(rnode_194to195_input_global_id_0_0_valid_out_reg_195_NO_SHIFT_REG),
+	.stall_out(rnode_194to195_input_global_id_0_0_stall_out_reg_195_NO_SHIFT_REG),
+	.data_in(rnode_1to194_input_global_id_0_0_NO_SHIFT_REG),
+	.data_out(rnode_194to195_input_global_id_0_0_reg_195_NO_SHIFT_REG)
 );
 
-defparam rnode_1to2_bb1_mul6_add62_0_reg_2_fifo.DEPTH = 2;
-defparam rnode_1to2_bb1_mul6_add62_0_reg_2_fifo.DATA_WIDTH = 32;
-defparam rnode_1to2_bb1_mul6_add62_0_reg_2_fifo.ALLOW_FULL_WRITE = 0;
-defparam rnode_1to2_bb1_mul6_add62_0_reg_2_fifo.IMPL = "ll_reg";
+defparam rnode_194to195_input_global_id_0_0_reg_195_fifo.DEPTH = 2;
+defparam rnode_194to195_input_global_id_0_0_reg_195_fifo.DATA_WIDTH = 32;
+defparam rnode_194to195_input_global_id_0_0_reg_195_fifo.ALLOW_FULL_WRITE = 0;
+defparam rnode_194to195_input_global_id_0_0_reg_195_fifo.IMPL = "ll_reg";
 
-assign rnode_1to2_bb1_mul6_add62_0_reg_2_inputs_ready_NO_SHIFT_REG = local_bb1_mul6_add62_valid_out;
-assign local_bb1_mul6_add62_stall_in = rnode_1to2_bb1_mul6_add62_0_stall_out_reg_2_NO_SHIFT_REG;
-assign rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG = rnode_1to2_bb1_mul6_add62_0_reg_2_NO_SHIFT_REG;
-assign rnode_1to2_bb1_mul6_add62_0_stall_in_reg_2_NO_SHIFT_REG = rnode_1to2_bb1_mul6_add62_0_stall_in_NO_SHIFT_REG;
-assign rnode_1to2_bb1_mul6_add62_0_valid_out_NO_SHIFT_REG = rnode_1to2_bb1_mul6_add62_0_valid_out_reg_2_NO_SHIFT_REG;
+assign rnode_194to195_input_global_id_0_0_reg_195_inputs_ready_NO_SHIFT_REG = rnode_1to194_input_global_id_0_0_valid_out_NO_SHIFT_REG;
+assign rnode_1to194_input_global_id_0_0_stall_in_NO_SHIFT_REG = rnode_194to195_input_global_id_0_0_stall_out_reg_195_NO_SHIFT_REG;
+assign rnode_194to195_input_global_id_0_0_NO_SHIFT_REG = rnode_194to195_input_global_id_0_0_reg_195_NO_SHIFT_REG;
+assign rnode_194to195_input_global_id_0_0_stall_in_reg_195_NO_SHIFT_REG = rnode_194to195_input_global_id_0_0_stall_in_NO_SHIFT_REG;
+assign rnode_194to195_input_global_id_0_0_valid_out_NO_SHIFT_REG = rnode_194to195_input_global_id_0_0_valid_out_reg_195_NO_SHIFT_REG;
 
 // Register node:
 //  * latency = 1
 //  * capacity = 1
- logic rnode_194to195_bb1_or_cond_xor_0_valid_out_NO_SHIFT_REG;
- logic rnode_194to195_bb1_or_cond_xor_0_stall_in_NO_SHIFT_REG;
- logic rnode_194to195_bb1_or_cond_xor_0_NO_SHIFT_REG;
- logic rnode_194to195_bb1_or_cond_xor_0_reg_195_inputs_ready_NO_SHIFT_REG;
- logic rnode_194to195_bb1_or_cond_xor_0_reg_195_NO_SHIFT_REG;
- logic rnode_194to195_bb1_or_cond_xor_0_valid_out_reg_195_NO_SHIFT_REG;
- logic rnode_194to195_bb1_or_cond_xor_0_stall_in_reg_195_NO_SHIFT_REG;
- logic rnode_194to195_bb1_or_cond_xor_0_stall_out_reg_195_NO_SHIFT_REG;
+ logic rnode_1to2_bb1_mul_add62_0_valid_out_NO_SHIFT_REG;
+ logic rnode_1to2_bb1_mul_add62_0_stall_in_NO_SHIFT_REG;
+ logic [31:0] rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG;
+ logic rnode_1to2_bb1_mul_add62_0_reg_2_inputs_ready_NO_SHIFT_REG;
+ logic [31:0] rnode_1to2_bb1_mul_add62_0_reg_2_NO_SHIFT_REG;
+ logic rnode_1to2_bb1_mul_add62_0_valid_out_reg_2_NO_SHIFT_REG;
+ logic rnode_1to2_bb1_mul_add62_0_stall_in_reg_2_NO_SHIFT_REG;
+ logic rnode_1to2_bb1_mul_add62_0_stall_out_reg_2_NO_SHIFT_REG;
 
-acl_data_fifo rnode_194to195_bb1_or_cond_xor_0_reg_195_fifo (
+acl_data_fifo rnode_1to2_bb1_mul_add62_0_reg_2_fifo (
 	.clock(clock),
 	.resetn(resetn),
-	.valid_in(rnode_194to195_bb1_or_cond_xor_0_reg_195_inputs_ready_NO_SHIFT_REG),
-	.stall_in(rnode_194to195_bb1_or_cond_xor_0_stall_in_reg_195_NO_SHIFT_REG),
-	.valid_out(rnode_194to195_bb1_or_cond_xor_0_valid_out_reg_195_NO_SHIFT_REG),
-	.stall_out(rnode_194to195_bb1_or_cond_xor_0_stall_out_reg_195_NO_SHIFT_REG),
-	.data_in(rnode_2to194_bb1_or_cond_xor_0_NO_SHIFT_REG),
-	.data_out(rnode_194to195_bb1_or_cond_xor_0_reg_195_NO_SHIFT_REG)
+	.valid_in(rnode_1to2_bb1_mul_add62_0_reg_2_inputs_ready_NO_SHIFT_REG),
+	.stall_in(rnode_1to2_bb1_mul_add62_0_stall_in_reg_2_NO_SHIFT_REG),
+	.valid_out(rnode_1to2_bb1_mul_add62_0_valid_out_reg_2_NO_SHIFT_REG),
+	.stall_out(rnode_1to2_bb1_mul_add62_0_stall_out_reg_2_NO_SHIFT_REG),
+	.data_in(local_bb1_mul_add62),
+	.data_out(rnode_1to2_bb1_mul_add62_0_reg_2_NO_SHIFT_REG)
 );
 
-defparam rnode_194to195_bb1_or_cond_xor_0_reg_195_fifo.DEPTH = 2;
-defparam rnode_194to195_bb1_or_cond_xor_0_reg_195_fifo.DATA_WIDTH = 1;
-defparam rnode_194to195_bb1_or_cond_xor_0_reg_195_fifo.ALLOW_FULL_WRITE = 0;
-defparam rnode_194to195_bb1_or_cond_xor_0_reg_195_fifo.IMPL = "ll_reg";
+defparam rnode_1to2_bb1_mul_add62_0_reg_2_fifo.DEPTH = 2;
+defparam rnode_1to2_bb1_mul_add62_0_reg_2_fifo.DATA_WIDTH = 32;
+defparam rnode_1to2_bb1_mul_add62_0_reg_2_fifo.ALLOW_FULL_WRITE = 0;
+defparam rnode_1to2_bb1_mul_add62_0_reg_2_fifo.IMPL = "ll_reg";
 
-assign rnode_194to195_bb1_or_cond_xor_0_reg_195_inputs_ready_NO_SHIFT_REG = rnode_2to194_bb1_or_cond_xor_0_valid_out_NO_SHIFT_REG;
-assign rnode_2to194_bb1_or_cond_xor_0_stall_in_NO_SHIFT_REG = rnode_194to195_bb1_or_cond_xor_0_stall_out_reg_195_NO_SHIFT_REG;
-assign rnode_194to195_bb1_or_cond_xor_0_NO_SHIFT_REG = rnode_194to195_bb1_or_cond_xor_0_reg_195_NO_SHIFT_REG;
-assign rnode_194to195_bb1_or_cond_xor_0_stall_in_reg_195_NO_SHIFT_REG = rnode_194to195_bb1_or_cond_xor_0_stall_in_NO_SHIFT_REG;
-assign rnode_194to195_bb1_or_cond_xor_0_valid_out_NO_SHIFT_REG = rnode_194to195_bb1_or_cond_xor_0_valid_out_reg_195_NO_SHIFT_REG;
+assign rnode_1to2_bb1_mul_add62_0_reg_2_inputs_ready_NO_SHIFT_REG = local_bb1_mul_add62_valid_out;
+assign local_bb1_mul_add62_stall_in = rnode_1to2_bb1_mul_add62_0_stall_out_reg_2_NO_SHIFT_REG;
+assign rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG = rnode_1to2_bb1_mul_add62_0_reg_2_NO_SHIFT_REG;
+assign rnode_1to2_bb1_mul_add62_0_stall_in_reg_2_NO_SHIFT_REG = rnode_1to2_bb1_mul_add62_0_stall_in_NO_SHIFT_REG;
+assign rnode_1to2_bb1_mul_add62_0_valid_out_NO_SHIFT_REG = rnode_1to2_bb1_mul_add62_0_valid_out_reg_2_NO_SHIFT_REG;
 
-// Register node:
-//  * latency = 1
-//  * capacity = 1
- logic rnode_194to195_bb1_add_0_valid_out_NO_SHIFT_REG;
- logic rnode_194to195_bb1_add_0_stall_in_NO_SHIFT_REG;
- logic [31:0] rnode_194to195_bb1_add_0_NO_SHIFT_REG;
- logic rnode_194to195_bb1_add_0_reg_195_inputs_ready_NO_SHIFT_REG;
- logic [31:0] rnode_194to195_bb1_add_0_reg_195_NO_SHIFT_REG;
- logic rnode_194to195_bb1_add_0_valid_out_reg_195_NO_SHIFT_REG;
- logic rnode_194to195_bb1_add_0_stall_in_reg_195_NO_SHIFT_REG;
- logic rnode_194to195_bb1_add_0_stall_out_reg_195_NO_SHIFT_REG;
+// This section implements an unregistered operation.
+// 
+wire local_bb1_idxprom20_stall_local;
+wire [63:0] local_bb1_idxprom20;
 
-acl_data_fifo rnode_194to195_bb1_add_0_reg_195_fifo (
-	.clock(clock),
-	.resetn(resetn),
-	.valid_in(rnode_194to195_bb1_add_0_reg_195_inputs_ready_NO_SHIFT_REG),
-	.stall_in(rnode_194to195_bb1_add_0_stall_in_reg_195_NO_SHIFT_REG),
-	.valid_out(rnode_194to195_bb1_add_0_valid_out_reg_195_NO_SHIFT_REG),
-	.stall_out(rnode_194to195_bb1_add_0_stall_out_reg_195_NO_SHIFT_REG),
-	.data_in(rnode_1to194_bb1_add_0_NO_SHIFT_REG),
-	.data_out(rnode_194to195_bb1_add_0_reg_195_NO_SHIFT_REG)
-);
-
-defparam rnode_194to195_bb1_add_0_reg_195_fifo.DEPTH = 2;
-defparam rnode_194to195_bb1_add_0_reg_195_fifo.DATA_WIDTH = 32;
-defparam rnode_194to195_bb1_add_0_reg_195_fifo.ALLOW_FULL_WRITE = 0;
-defparam rnode_194to195_bb1_add_0_reg_195_fifo.IMPL = "ll_reg";
-
-assign rnode_194to195_bb1_add_0_reg_195_inputs_ready_NO_SHIFT_REG = rnode_1to194_bb1_add_0_valid_out_NO_SHIFT_REG;
-assign rnode_1to194_bb1_add_0_stall_in_NO_SHIFT_REG = rnode_194to195_bb1_add_0_stall_out_reg_195_NO_SHIFT_REG;
-assign rnode_194to195_bb1_add_0_NO_SHIFT_REG = rnode_194to195_bb1_add_0_reg_195_NO_SHIFT_REG;
-assign rnode_194to195_bb1_add_0_stall_in_reg_195_NO_SHIFT_REG = rnode_194to195_bb1_add_0_stall_in_NO_SHIFT_REG;
-assign rnode_194to195_bb1_add_0_valid_out_NO_SHIFT_REG = rnode_194to195_bb1_add_0_valid_out_reg_195_NO_SHIFT_REG;
+assign local_bb1_idxprom20[32] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[33] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[34] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[35] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[36] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[37] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[38] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[39] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[40] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[41] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[42] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[43] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[44] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[45] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[46] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[47] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[48] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[49] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[50] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[51] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[52] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[53] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[54] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[55] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[56] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[57] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[58] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[59] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[60] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[61] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[62] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[63] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom20[31:0] = rnode_194to195_input_global_id_0_0_NO_SHIFT_REG;
 
 // This section implements an unregistered operation.
 // 
 wire local_bb1_idxprom_stall_local;
 wire [63:0] local_bb1_idxprom;
 
-assign local_bb1_idxprom[32] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[33] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[34] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[35] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[36] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[37] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[38] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[39] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[40] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[41] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[42] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[43] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[44] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[45] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[46] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[47] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[48] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[49] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[50] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[51] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[52] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[53] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[54] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[55] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[56] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[57] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[58] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[59] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[60] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[61] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[62] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[63] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom[31:0] = rnode_1to2_bb1_mul6_add62_0_NO_SHIFT_REG;
+assign local_bb1_idxprom[32] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[33] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[34] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[35] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[36] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[37] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[38] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[39] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[40] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[41] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[42] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[43] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[44] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[45] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[46] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[47] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[48] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[49] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[50] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[51] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[52] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[53] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[54] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[55] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[56] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[57] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[58] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[59] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[60] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[61] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[62] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[63] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG[31];
+assign local_bb1_idxprom[31:0] = rnode_1to2_bb1_mul_add62_0_NO_SHIFT_REG;
 
 // This section implements an unregistered operation.
 // 
-wire local_bb1_idxprom25_stall_local;
-wire [63:0] local_bb1_idxprom25;
+wire local_bb1_arrayidx21_valid_out;
+wire local_bb1_arrayidx21_stall_in;
+wire local_bb1_arrayidx21_inputs_ready;
+wire local_bb1_arrayidx21_stall_local;
+wire [63:0] local_bb1_arrayidx21;
 
-assign local_bb1_idxprom25[32] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[33] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[34] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[35] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[36] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[37] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[38] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[39] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[40] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[41] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[42] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[43] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[44] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[45] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[46] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[47] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[48] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[49] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[50] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[51] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[52] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[53] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[54] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[55] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[56] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[57] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[58] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[59] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[60] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[61] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[62] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[63] = rnode_194to195_bb1_add_0_NO_SHIFT_REG[31];
-assign local_bb1_idxprom25[31:0] = rnode_194to195_bb1_add_0_NO_SHIFT_REG;
+assign local_bb1_arrayidx21_inputs_ready = rnode_194to195_input_global_id_0_0_valid_out_NO_SHIFT_REG;
+assign local_bb1_arrayidx21 = (input_grayImage + local_bb1_idxprom20);
+assign local_bb1_arrayidx21_valid_out = local_bb1_arrayidx21_inputs_ready;
+assign local_bb1_arrayidx21_stall_local = local_bb1_arrayidx21_stall_in;
+assign rnode_194to195_input_global_id_0_0_stall_in_NO_SHIFT_REG = (|local_bb1_arrayidx21_stall_local);
 
 // This section implements an unregistered operation.
 // 
@@ -861,31 +665,17 @@ assign local_bb1_arrayidx = (input_rgbImage + local_bb1_idxprom);
 
 // This section implements an unregistered operation.
 // 
-wire local_bb1_arrayidx26_valid_out;
-wire local_bb1_arrayidx26_stall_in;
-wire local_bb1_arrayidx26_inputs_ready;
-wire local_bb1_arrayidx26_stall_local;
-wire [63:0] local_bb1_arrayidx26;
-
-assign local_bb1_arrayidx26_inputs_ready = rnode_194to195_bb1_add_0_valid_out_NO_SHIFT_REG;
-assign local_bb1_arrayidx26 = (input_grayImage + local_bb1_idxprom25);
-assign local_bb1_arrayidx26_valid_out = local_bb1_arrayidx26_inputs_ready;
-assign local_bb1_arrayidx26_stall_local = local_bb1_arrayidx26_stall_in;
-assign rnode_194to195_bb1_add_0_stall_in_NO_SHIFT_REG = (|local_bb1_arrayidx26_stall_local);
-
-// This section implements an unregistered operation.
-// 
 wire local_bb1_memcoalesce_rgbImage_bitcast_0_valid_out;
 wire local_bb1_memcoalesce_rgbImage_bitcast_0_stall_in;
 wire local_bb1_memcoalesce_rgbImage_bitcast_0_inputs_ready;
 wire local_bb1_memcoalesce_rgbImage_bitcast_0_stall_local;
 wire [63:0] local_bb1_memcoalesce_rgbImage_bitcast_0;
 
-assign local_bb1_memcoalesce_rgbImage_bitcast_0_inputs_ready = rnode_1to2_bb1_mul6_add62_0_valid_out_NO_SHIFT_REG;
+assign local_bb1_memcoalesce_rgbImage_bitcast_0_inputs_ready = rnode_1to2_bb1_mul_add62_0_valid_out_NO_SHIFT_REG;
 assign local_bb1_memcoalesce_rgbImage_bitcast_0 = local_bb1_arrayidx;
 assign local_bb1_memcoalesce_rgbImage_bitcast_0_valid_out = local_bb1_memcoalesce_rgbImage_bitcast_0_inputs_ready;
 assign local_bb1_memcoalesce_rgbImage_bitcast_0_stall_local = local_bb1_memcoalesce_rgbImage_bitcast_0_stall_in;
-assign rnode_1to2_bb1_mul6_add62_0_stall_in_NO_SHIFT_REG = (|local_bb1_memcoalesce_rgbImage_bitcast_0_stall_local);
+assign rnode_1to2_bb1_mul_add62_0_stall_in_NO_SHIFT_REG = (|local_bb1_memcoalesce_rgbImage_bitcast_0_stall_local);
 
 // This section implements a registered operation.
 // 
@@ -912,7 +702,7 @@ lsu_top lsu_local_bb1_ld_memcoalesce_rgbImage_load_0 (
 	.i_address(local_bb1_memcoalesce_rgbImage_bitcast_0),
 	.i_writedata(),
 	.i_cmpdata(),
-	.i_predicate(rnode_1to2_bb1_or_cond_xor_0_NO_SHIFT_REG),
+	.i_predicate(1'b0),
 	.i_bitwiseor(64'h0),
 	.i_byteenable(),
 	.i_stall(~(local_bb1_ld_memcoalesce_rgbImage_load_0_output_regs_ready)),
@@ -935,7 +725,7 @@ lsu_top lsu_local_bb1_ld_memcoalesce_rgbImage_load_0 (
 	.profile_bw(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_cntl),
 	.profile_bw_incr(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_incr),
 	.profile_total_ivalid(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_ivalid_cntl),
-	.profile_total_req(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_req_cntl),
+	.profile_total_req(),
 	.profile_i_stall_count(),
 	.profile_o_stall_count(),
 	.profile_avm_readwrite_count(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_readwrite_count_cntl),
@@ -974,10 +764,9 @@ defparam lsu_local_bb1_ld_memcoalesce_rgbImage_load_0.ACL_PROFILE_INCREMENT_WIDT
 defparam lsu_local_bb1_ld_memcoalesce_rgbImage_load_0.ADDRSPACE = 1;
 defparam lsu_local_bb1_ld_memcoalesce_rgbImage_load_0.STYLE = "BURST-NON-ALIGNED";
 
-assign local_bb1_ld_memcoalesce_rgbImage_load_0_inputs_ready = (local_bb1_memcoalesce_rgbImage_bitcast_0_valid_out & rnode_1to2_bb1_or_cond_xor_0_valid_out_0_NO_SHIFT_REG);
+assign local_bb1_ld_memcoalesce_rgbImage_load_0_inputs_ready = local_bb1_memcoalesce_rgbImage_bitcast_0_valid_out;
 assign local_bb1_ld_memcoalesce_rgbImage_load_0_output_regs_ready = (&(~(local_bb1_ld_memcoalesce_rgbImage_load_0_valid_out_NO_SHIFT_REG) | ~(local_bb1_ld_memcoalesce_rgbImage_load_0_stall_in)));
 assign local_bb1_memcoalesce_rgbImage_bitcast_0_stall_in = (local_bb1_ld_memcoalesce_rgbImage_load_0_fu_stall_out | ~(local_bb1_ld_memcoalesce_rgbImage_load_0_inputs_ready));
-assign rnode_1to2_bb1_or_cond_xor_0_stall_in_0_NO_SHIFT_REG = (local_bb1_ld_memcoalesce_rgbImage_load_0_fu_stall_out | ~(local_bb1_ld_memcoalesce_rgbImage_load_0_inputs_ready));
 assign local_bb1_ld_memcoalesce_rgbImage_load_0_causedstall = (local_bb1_ld_memcoalesce_rgbImage_load_0_inputs_ready && (local_bb1_ld_memcoalesce_rgbImage_load_0_fu_stall_out && !(~(local_bb1_ld_memcoalesce_rgbImage_load_0_output_regs_ready))));
 
 always @(posedge clock or negedge resetn)
@@ -1145,33 +934,33 @@ assign local_bb1_memcoalesce_rgbImage_extrValue_2 = local_bb1_c0_ene1[23:16];
 
 // This section implements an unregistered operation.
 // 
-wire local_bb1_conv13_stall_local;
-wire [31:0] local_bb1_conv13;
+wire local_bb1_conv1_stall_local;
+wire [31:0] local_bb1_conv1;
 
-assign local_bb1_conv13[31:8] = 24'h0;
-assign local_bb1_conv13[7:0] = local_bb1_memcoalesce_rgbImage_extrValue_0;
+assign local_bb1_conv1[31:8] = 24'h0;
+assign local_bb1_conv1[7:0] = local_bb1_memcoalesce_rgbImage_extrValue_0;
 
 // This section implements an unregistered operation.
 // 
 wire local_bb1_memcoalesce_rgbImage_extrValue_2_valid_out;
 wire local_bb1_memcoalesce_rgbImage_extrValue_2_stall_in;
  reg local_bb1_memcoalesce_rgbImage_extrValue_2_consumed_0_NO_SHIFT_REG;
-wire local_bb1_conv13_valid_out;
-wire local_bb1_conv13_stall_in;
- reg local_bb1_conv13_consumed_0_NO_SHIFT_REG;
-wire local_bb1_conv16_valid_out;
-wire local_bb1_conv16_stall_in;
- reg local_bb1_conv16_consumed_0_NO_SHIFT_REG;
-wire local_bb1_conv16_inputs_ready;
-wire local_bb1_conv16_stall_local;
-wire [31:0] local_bb1_conv16;
+wire local_bb1_conv1_valid_out;
+wire local_bb1_conv1_stall_in;
+ reg local_bb1_conv1_consumed_0_NO_SHIFT_REG;
+wire local_bb1_conv7_valid_out;
+wire local_bb1_conv7_stall_in;
+ reg local_bb1_conv7_consumed_0_NO_SHIFT_REG;
+wire local_bb1_conv7_inputs_ready;
+wire local_bb1_conv7_stall_local;
+wire [31:0] local_bb1_conv7;
 
-assign local_bb1_conv16_inputs_ready = local_bb1_c0_enter_c0_eni1_valid_out_NO_SHIFT_REG;
-assign local_bb1_conv16[31:8] = 24'h0;
-assign local_bb1_conv16[7:0] = local_bb1_memcoalesce_rgbImage_extrValue_1;
+assign local_bb1_conv7_inputs_ready = local_bb1_c0_enter_c0_eni1_valid_out_NO_SHIFT_REG;
+assign local_bb1_conv7[31:8] = 24'h0;
+assign local_bb1_conv7[7:0] = local_bb1_memcoalesce_rgbImage_extrValue_1;
 assign local_bb1_memcoalesce_rgbImage_extrValue_2_valid_out = 1'b1;
-assign local_bb1_conv13_valid_out = 1'b1;
-assign local_bb1_conv16_valid_out = 1'b1;
+assign local_bb1_conv1_valid_out = 1'b1;
+assign local_bb1_conv7_valid_out = 1'b1;
 assign local_bb1_c0_enter_c0_eni1_stall_in = 1'b0;
 
 always @(posedge clock or negedge resetn)
@@ -1179,14 +968,14 @@ begin
 	if (~(resetn))
 	begin
 		local_bb1_memcoalesce_rgbImage_extrValue_2_consumed_0_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv13_consumed_0_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv16_consumed_0_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv1_consumed_0_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv7_consumed_0_NO_SHIFT_REG <= 1'b0;
 	end
 	else
 	begin
-		local_bb1_memcoalesce_rgbImage_extrValue_2_consumed_0_NO_SHIFT_REG <= (local_bb1_conv16_inputs_ready & (local_bb1_memcoalesce_rgbImage_extrValue_2_consumed_0_NO_SHIFT_REG | ~(local_bb1_memcoalesce_rgbImage_extrValue_2_stall_in)) & local_bb1_conv16_stall_local);
-		local_bb1_conv13_consumed_0_NO_SHIFT_REG <= (local_bb1_conv16_inputs_ready & (local_bb1_conv13_consumed_0_NO_SHIFT_REG | ~(local_bb1_conv13_stall_in)) & local_bb1_conv16_stall_local);
-		local_bb1_conv16_consumed_0_NO_SHIFT_REG <= (local_bb1_conv16_inputs_ready & (local_bb1_conv16_consumed_0_NO_SHIFT_REG | ~(local_bb1_conv16_stall_in)) & local_bb1_conv16_stall_local);
+		local_bb1_memcoalesce_rgbImage_extrValue_2_consumed_0_NO_SHIFT_REG <= (local_bb1_conv7_inputs_ready & (local_bb1_memcoalesce_rgbImage_extrValue_2_consumed_0_NO_SHIFT_REG | ~(local_bb1_memcoalesce_rgbImage_extrValue_2_stall_in)) & local_bb1_conv7_stall_local);
+		local_bb1_conv1_consumed_0_NO_SHIFT_REG <= (local_bb1_conv7_inputs_ready & (local_bb1_conv1_consumed_0_NO_SHIFT_REG | ~(local_bb1_conv1_stall_in)) & local_bb1_conv7_stall_local);
+		local_bb1_conv7_consumed_0_NO_SHIFT_REG <= (local_bb1_conv7_inputs_ready & (local_bb1_conv7_consumed_0_NO_SHIFT_REG | ~(local_bb1_conv7_stall_in)) & local_bb1_conv7_stall_local);
 	end
 end
 
@@ -1227,50 +1016,50 @@ assign rnode_163to164_bb1_memcoalesce_rgbImage_extrValue_2_0_valid_out_NO_SHIFT_
 
 // This section implements a registered operation.
 // 
-wire local_bb1_conv14_inputs_ready;
- reg local_bb1_conv14_valid_out_NO_SHIFT_REG;
-wire local_bb1_conv14_stall_in;
-wire local_bb1_conv14_output_regs_ready;
-wire [31:0] local_bb1_conv14;
- reg local_bb1_conv14_valid_pipe_0_NO_SHIFT_REG;
- reg local_bb1_conv14_valid_pipe_1_NO_SHIFT_REG;
- reg local_bb1_conv14_valid_pipe_2_NO_SHIFT_REG;
- reg local_bb1_conv14_valid_pipe_3_NO_SHIFT_REG;
- reg local_bb1_conv14_valid_pipe_4_NO_SHIFT_REG;
-wire local_bb1_conv14_causedstall;
+wire local_bb1_conv2_inputs_ready;
+ reg local_bb1_conv2_valid_out_NO_SHIFT_REG;
+wire local_bb1_conv2_stall_in;
+wire local_bb1_conv2_output_regs_ready;
+wire [31:0] local_bb1_conv2;
+ reg local_bb1_conv2_valid_pipe_0_NO_SHIFT_REG;
+ reg local_bb1_conv2_valid_pipe_1_NO_SHIFT_REG;
+ reg local_bb1_conv2_valid_pipe_2_NO_SHIFT_REG;
+ reg local_bb1_conv2_valid_pipe_3_NO_SHIFT_REG;
+ reg local_bb1_conv2_valid_pipe_4_NO_SHIFT_REG;
+wire local_bb1_conv2_causedstall;
 
-acl_fp_sitofp fp_module_local_bb1_conv14 (
+acl_fp_sitofp fp_module_local_bb1_conv2 (
 	.clock(clock),
-	.dataa(local_bb1_conv13),
-	.enable(local_bb1_conv14_output_regs_ready),
-	.result(local_bb1_conv14)
+	.dataa(local_bb1_conv1),
+	.enable(local_bb1_conv2_output_regs_ready),
+	.result(local_bb1_conv2)
 );
 
 
-assign local_bb1_conv14_inputs_ready = 1'b1;
-assign local_bb1_conv14_output_regs_ready = 1'b1;
-assign local_bb1_conv13_stall_in = 1'b0;
-assign local_bb1_conv14_causedstall = (1'b1 && (1'b0 && !(1'b0)));
+assign local_bb1_conv2_inputs_ready = 1'b1;
+assign local_bb1_conv2_output_regs_ready = 1'b1;
+assign local_bb1_conv1_stall_in = 1'b0;
+assign local_bb1_conv2_causedstall = (1'b1 && (1'b0 && !(1'b0)));
 
 always @(posedge clock or negedge resetn)
 begin
 	if (~(resetn))
 	begin
-		local_bb1_conv14_valid_pipe_0_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv14_valid_pipe_1_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv14_valid_pipe_2_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv14_valid_pipe_3_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv14_valid_pipe_4_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv2_valid_pipe_0_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv2_valid_pipe_1_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv2_valid_pipe_2_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv2_valid_pipe_3_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv2_valid_pipe_4_NO_SHIFT_REG <= 1'b0;
 	end
 	else
 	begin
-		if (local_bb1_conv14_output_regs_ready)
+		if (local_bb1_conv2_output_regs_ready)
 		begin
-			local_bb1_conv14_valid_pipe_0_NO_SHIFT_REG <= 1'b1;
-			local_bb1_conv14_valid_pipe_1_NO_SHIFT_REG <= local_bb1_conv14_valid_pipe_0_NO_SHIFT_REG;
-			local_bb1_conv14_valid_pipe_2_NO_SHIFT_REG <= local_bb1_conv14_valid_pipe_1_NO_SHIFT_REG;
-			local_bb1_conv14_valid_pipe_3_NO_SHIFT_REG <= local_bb1_conv14_valid_pipe_2_NO_SHIFT_REG;
-			local_bb1_conv14_valid_pipe_4_NO_SHIFT_REG <= local_bb1_conv14_valid_pipe_3_NO_SHIFT_REG;
+			local_bb1_conv2_valid_pipe_0_NO_SHIFT_REG <= 1'b1;
+			local_bb1_conv2_valid_pipe_1_NO_SHIFT_REG <= local_bb1_conv2_valid_pipe_0_NO_SHIFT_REG;
+			local_bb1_conv2_valid_pipe_2_NO_SHIFT_REG <= local_bb1_conv2_valid_pipe_1_NO_SHIFT_REG;
+			local_bb1_conv2_valid_pipe_3_NO_SHIFT_REG <= local_bb1_conv2_valid_pipe_2_NO_SHIFT_REG;
+			local_bb1_conv2_valid_pipe_4_NO_SHIFT_REG <= local_bb1_conv2_valid_pipe_3_NO_SHIFT_REG;
 		end
 	end
 end
@@ -1279,19 +1068,19 @@ always @(posedge clock or negedge resetn)
 begin
 	if (~(resetn))
 	begin
-		local_bb1_conv14_valid_out_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv2_valid_out_NO_SHIFT_REG <= 1'b0;
 	end
 	else
 	begin
-		if (local_bb1_conv14_output_regs_ready)
+		if (local_bb1_conv2_output_regs_ready)
 		begin
-			local_bb1_conv14_valid_out_NO_SHIFT_REG <= 1'b1;
+			local_bb1_conv2_valid_out_NO_SHIFT_REG <= 1'b1;
 		end
 		else
 		begin
-			if (~(local_bb1_conv14_stall_in))
+			if (~(local_bb1_conv2_stall_in))
 			begin
-				local_bb1_conv14_valid_out_NO_SHIFT_REG <= 1'b0;
+				local_bb1_conv2_valid_out_NO_SHIFT_REG <= 1'b0;
 			end
 		end
 	end
@@ -1300,50 +1089,50 @@ end
 
 // This section implements a registered operation.
 // 
-wire local_bb1_conv17_inputs_ready;
- reg local_bb1_conv17_valid_out_NO_SHIFT_REG;
-wire local_bb1_conv17_stall_in;
-wire local_bb1_conv17_output_regs_ready;
-wire [31:0] local_bb1_conv17;
- reg local_bb1_conv17_valid_pipe_0_NO_SHIFT_REG;
- reg local_bb1_conv17_valid_pipe_1_NO_SHIFT_REG;
- reg local_bb1_conv17_valid_pipe_2_NO_SHIFT_REG;
- reg local_bb1_conv17_valid_pipe_3_NO_SHIFT_REG;
- reg local_bb1_conv17_valid_pipe_4_NO_SHIFT_REG;
-wire local_bb1_conv17_causedstall;
+wire local_bb1_conv8_inputs_ready;
+ reg local_bb1_conv8_valid_out_NO_SHIFT_REG;
+wire local_bb1_conv8_stall_in;
+wire local_bb1_conv8_output_regs_ready;
+wire [31:0] local_bb1_conv8;
+ reg local_bb1_conv8_valid_pipe_0_NO_SHIFT_REG;
+ reg local_bb1_conv8_valid_pipe_1_NO_SHIFT_REG;
+ reg local_bb1_conv8_valid_pipe_2_NO_SHIFT_REG;
+ reg local_bb1_conv8_valid_pipe_3_NO_SHIFT_REG;
+ reg local_bb1_conv8_valid_pipe_4_NO_SHIFT_REG;
+wire local_bb1_conv8_causedstall;
 
-acl_fp_sitofp fp_module_local_bb1_conv17 (
+acl_fp_sitofp fp_module_local_bb1_conv8 (
 	.clock(clock),
-	.dataa(local_bb1_conv16),
-	.enable(local_bb1_conv17_output_regs_ready),
-	.result(local_bb1_conv17)
+	.dataa(local_bb1_conv7),
+	.enable(local_bb1_conv8_output_regs_ready),
+	.result(local_bb1_conv8)
 );
 
 
-assign local_bb1_conv17_inputs_ready = 1'b1;
-assign local_bb1_conv17_output_regs_ready = 1'b1;
-assign local_bb1_conv16_stall_in = 1'b0;
-assign local_bb1_conv17_causedstall = (1'b1 && (1'b0 && !(1'b0)));
+assign local_bb1_conv8_inputs_ready = 1'b1;
+assign local_bb1_conv8_output_regs_ready = 1'b1;
+assign local_bb1_conv7_stall_in = 1'b0;
+assign local_bb1_conv8_causedstall = (1'b1 && (1'b0 && !(1'b0)));
 
 always @(posedge clock or negedge resetn)
 begin
 	if (~(resetn))
 	begin
-		local_bb1_conv17_valid_pipe_0_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv17_valid_pipe_1_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv17_valid_pipe_2_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv17_valid_pipe_3_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv17_valid_pipe_4_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv8_valid_pipe_0_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv8_valid_pipe_1_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv8_valid_pipe_2_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv8_valid_pipe_3_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv8_valid_pipe_4_NO_SHIFT_REG <= 1'b0;
 	end
 	else
 	begin
-		if (local_bb1_conv17_output_regs_ready)
+		if (local_bb1_conv8_output_regs_ready)
 		begin
-			local_bb1_conv17_valid_pipe_0_NO_SHIFT_REG <= 1'b1;
-			local_bb1_conv17_valid_pipe_1_NO_SHIFT_REG <= local_bb1_conv17_valid_pipe_0_NO_SHIFT_REG;
-			local_bb1_conv17_valid_pipe_2_NO_SHIFT_REG <= local_bb1_conv17_valid_pipe_1_NO_SHIFT_REG;
-			local_bb1_conv17_valid_pipe_3_NO_SHIFT_REG <= local_bb1_conv17_valid_pipe_2_NO_SHIFT_REG;
-			local_bb1_conv17_valid_pipe_4_NO_SHIFT_REG <= local_bb1_conv17_valid_pipe_3_NO_SHIFT_REG;
+			local_bb1_conv8_valid_pipe_0_NO_SHIFT_REG <= 1'b1;
+			local_bb1_conv8_valid_pipe_1_NO_SHIFT_REG <= local_bb1_conv8_valid_pipe_0_NO_SHIFT_REG;
+			local_bb1_conv8_valid_pipe_2_NO_SHIFT_REG <= local_bb1_conv8_valid_pipe_1_NO_SHIFT_REG;
+			local_bb1_conv8_valid_pipe_3_NO_SHIFT_REG <= local_bb1_conv8_valid_pipe_2_NO_SHIFT_REG;
+			local_bb1_conv8_valid_pipe_4_NO_SHIFT_REG <= local_bb1_conv8_valid_pipe_3_NO_SHIFT_REG;
 		end
 	end
 end
@@ -1352,19 +1141,19 @@ always @(posedge clock or negedge resetn)
 begin
 	if (~(resetn))
 	begin
-		local_bb1_conv17_valid_out_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv8_valid_out_NO_SHIFT_REG <= 1'b0;
 	end
 	else
 	begin
-		if (local_bb1_conv17_output_regs_ready)
+		if (local_bb1_conv8_output_regs_ready)
 		begin
-			local_bb1_conv17_valid_out_NO_SHIFT_REG <= 1'b1;
+			local_bb1_conv8_valid_out_NO_SHIFT_REG <= 1'b1;
 		end
 		else
 		begin
-			if (~(local_bb1_conv17_stall_in))
+			if (~(local_bb1_conv8_stall_in))
 			begin
-				local_bb1_conv17_valid_out_NO_SHIFT_REG <= 1'b0;
+				local_bb1_conv8_valid_out_NO_SHIFT_REG <= 1'b0;
 			end
 		end
 	end
@@ -1410,14 +1199,14 @@ assign rnode_164to169_bb1_memcoalesce_rgbImage_extrValue_2_0_valid_out_NO_SHIFT_
 wire local_bb1_var__u0_stall_local;
 wire [31:0] local_bb1_var__u0;
 
-assign local_bb1_var__u0 = local_bb1_conv14;
+assign local_bb1_var__u0 = local_bb1_conv2;
 
 // This section implements an unregistered operation.
 // 
 wire local_bb1_var__u1_stall_local;
 wire [31:0] local_bb1_var__u1;
 
-assign local_bb1_var__u1 = local_bb1_conv17;
+assign local_bb1_var__u1 = local_bb1_conv8;
 
 // Register node:
 //  * latency = 1
@@ -1497,16 +1286,16 @@ assign local_bb1_and5_i286 = (local_bb1_var__u1 & 32'h7FFFFF);
 
 // This section implements an unregistered operation.
 // 
-wire local_bb1_conv20_valid_out;
-wire local_bb1_conv20_stall_in;
-wire local_bb1_conv20_inputs_ready;
-wire local_bb1_conv20_stall_local;
-wire [31:0] local_bb1_conv20;
+wire local_bb1_conv15_valid_out;
+wire local_bb1_conv15_stall_in;
+wire local_bb1_conv15_inputs_ready;
+wire local_bb1_conv15_stall_local;
+wire [31:0] local_bb1_conv15;
 
-assign local_bb1_conv20_inputs_ready = rnode_169to170_bb1_memcoalesce_rgbImage_extrValue_2_0_valid_out_NO_SHIFT_REG;
-assign local_bb1_conv20[31:8] = 24'h0;
-assign local_bb1_conv20[7:0] = rnode_169to170_bb1_memcoalesce_rgbImage_extrValue_2_0_NO_SHIFT_REG;
-assign local_bb1_conv20_valid_out = 1'b1;
+assign local_bb1_conv15_inputs_ready = rnode_169to170_bb1_memcoalesce_rgbImage_extrValue_2_0_valid_out_NO_SHIFT_REG;
+assign local_bb1_conv15[31:8] = 24'h0;
+assign local_bb1_conv15[7:0] = rnode_169to170_bb1_memcoalesce_rgbImage_extrValue_2_0_NO_SHIFT_REG;
+assign local_bb1_conv15_valid_out = 1'b1;
 assign rnode_169to170_bb1_memcoalesce_rgbImage_extrValue_2_0_stall_in_NO_SHIFT_REG = 1'b0;
 
 // This section implements an unregistered operation.
@@ -1539,50 +1328,50 @@ assign local_bb1_or_i300 = (local_bb1_and5_i286 | 32'h800000);
 
 // This section implements a registered operation.
 // 
-wire local_bb1_conv21_inputs_ready;
- reg local_bb1_conv21_valid_out_NO_SHIFT_REG;
-wire local_bb1_conv21_stall_in;
-wire local_bb1_conv21_output_regs_ready;
-wire [31:0] local_bb1_conv21;
- reg local_bb1_conv21_valid_pipe_0_NO_SHIFT_REG;
- reg local_bb1_conv21_valid_pipe_1_NO_SHIFT_REG;
- reg local_bb1_conv21_valid_pipe_2_NO_SHIFT_REG;
- reg local_bb1_conv21_valid_pipe_3_NO_SHIFT_REG;
- reg local_bb1_conv21_valid_pipe_4_NO_SHIFT_REG;
-wire local_bb1_conv21_causedstall;
+wire local_bb1_conv16_inputs_ready;
+ reg local_bb1_conv16_valid_out_NO_SHIFT_REG;
+wire local_bb1_conv16_stall_in;
+wire local_bb1_conv16_output_regs_ready;
+wire [31:0] local_bb1_conv16;
+ reg local_bb1_conv16_valid_pipe_0_NO_SHIFT_REG;
+ reg local_bb1_conv16_valid_pipe_1_NO_SHIFT_REG;
+ reg local_bb1_conv16_valid_pipe_2_NO_SHIFT_REG;
+ reg local_bb1_conv16_valid_pipe_3_NO_SHIFT_REG;
+ reg local_bb1_conv16_valid_pipe_4_NO_SHIFT_REG;
+wire local_bb1_conv16_causedstall;
 
-acl_fp_sitofp fp_module_local_bb1_conv21 (
+acl_fp_sitofp fp_module_local_bb1_conv16 (
 	.clock(clock),
-	.dataa(local_bb1_conv20),
-	.enable(local_bb1_conv21_output_regs_ready),
-	.result(local_bb1_conv21)
+	.dataa(local_bb1_conv15),
+	.enable(local_bb1_conv16_output_regs_ready),
+	.result(local_bb1_conv16)
 );
 
 
-assign local_bb1_conv21_inputs_ready = 1'b1;
-assign local_bb1_conv21_output_regs_ready = 1'b1;
-assign local_bb1_conv20_stall_in = 1'b0;
-assign local_bb1_conv21_causedstall = (1'b1 && (1'b0 && !(1'b0)));
+assign local_bb1_conv16_inputs_ready = 1'b1;
+assign local_bb1_conv16_output_regs_ready = 1'b1;
+assign local_bb1_conv15_stall_in = 1'b0;
+assign local_bb1_conv16_causedstall = (1'b1 && (1'b0 && !(1'b0)));
 
 always @(posedge clock or negedge resetn)
 begin
 	if (~(resetn))
 	begin
-		local_bb1_conv21_valid_pipe_0_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv21_valid_pipe_1_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv21_valid_pipe_2_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv21_valid_pipe_3_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv21_valid_pipe_4_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv16_valid_pipe_0_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv16_valid_pipe_1_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv16_valid_pipe_2_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv16_valid_pipe_3_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv16_valid_pipe_4_NO_SHIFT_REG <= 1'b0;
 	end
 	else
 	begin
-		if (local_bb1_conv21_output_regs_ready)
+		if (local_bb1_conv16_output_regs_ready)
 		begin
-			local_bb1_conv21_valid_pipe_0_NO_SHIFT_REG <= 1'b1;
-			local_bb1_conv21_valid_pipe_1_NO_SHIFT_REG <= local_bb1_conv21_valid_pipe_0_NO_SHIFT_REG;
-			local_bb1_conv21_valid_pipe_2_NO_SHIFT_REG <= local_bb1_conv21_valid_pipe_1_NO_SHIFT_REG;
-			local_bb1_conv21_valid_pipe_3_NO_SHIFT_REG <= local_bb1_conv21_valid_pipe_2_NO_SHIFT_REG;
-			local_bb1_conv21_valid_pipe_4_NO_SHIFT_REG <= local_bb1_conv21_valid_pipe_3_NO_SHIFT_REG;
+			local_bb1_conv16_valid_pipe_0_NO_SHIFT_REG <= 1'b1;
+			local_bb1_conv16_valid_pipe_1_NO_SHIFT_REG <= local_bb1_conv16_valid_pipe_0_NO_SHIFT_REG;
+			local_bb1_conv16_valid_pipe_2_NO_SHIFT_REG <= local_bb1_conv16_valid_pipe_1_NO_SHIFT_REG;
+			local_bb1_conv16_valid_pipe_3_NO_SHIFT_REG <= local_bb1_conv16_valid_pipe_2_NO_SHIFT_REG;
+			local_bb1_conv16_valid_pipe_4_NO_SHIFT_REG <= local_bb1_conv16_valid_pipe_3_NO_SHIFT_REG;
 		end
 	end
 end
@@ -1591,19 +1380,19 @@ always @(posedge clock or negedge resetn)
 begin
 	if (~(resetn))
 	begin
-		local_bb1_conv21_valid_out_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv16_valid_out_NO_SHIFT_REG <= 1'b0;
 	end
 	else
 	begin
-		if (local_bb1_conv21_output_regs_ready)
+		if (local_bb1_conv16_output_regs_ready)
 		begin
-			local_bb1_conv21_valid_out_NO_SHIFT_REG <= 1'b1;
+			local_bb1_conv16_valid_out_NO_SHIFT_REG <= 1'b1;
 		end
 		else
 		begin
-			if (~(local_bb1_conv21_stall_in))
+			if (~(local_bb1_conv16_stall_in))
 			begin
-				local_bb1_conv21_valid_out_NO_SHIFT_REG <= 1'b0;
+				local_bb1_conv16_valid_out_NO_SHIFT_REG <= 1'b0;
 			end
 		end
 	end
@@ -1628,14 +1417,14 @@ wire local_bb1_conv_i_i_inputs_ready;
 wire local_bb1_conv_i_i_stall_local;
 wire [63:0] local_bb1_conv_i_i;
 
-assign local_bb1_conv_i_i_inputs_ready = local_bb1_conv14_valid_out_NO_SHIFT_REG;
+assign local_bb1_conv_i_i_inputs_ready = local_bb1_conv2_valid_out_NO_SHIFT_REG;
 assign local_bb1_conv_i_i[63:32] = 32'h0;
 assign local_bb1_conv_i_i[31:0] = local_bb1_or_i;
 assign local_bb1_shr_i_valid_out = 1'b1;
 assign local_bb1_and4_i_valid_out = 1'b1;
 assign local_bb1_lnot14_not_i_valid_out = 1'b1;
 assign local_bb1_conv_i_i_valid_out = 1'b1;
-assign local_bb1_conv14_stall_in = 1'b0;
+assign local_bb1_conv2_stall_in = 1'b0;
 
 always @(posedge clock or negedge resetn)
 begin
@@ -1674,14 +1463,14 @@ wire local_bb1_conv_i_i301_inputs_ready;
 wire local_bb1_conv_i_i301_stall_local;
 wire [63:0] local_bb1_conv_i_i301;
 
-assign local_bb1_conv_i_i301_inputs_ready = local_bb1_conv17_valid_out_NO_SHIFT_REG;
+assign local_bb1_conv_i_i301_inputs_ready = local_bb1_conv8_valid_out_NO_SHIFT_REG;
 assign local_bb1_conv_i_i301[63:32] = 32'h0;
 assign local_bb1_conv_i_i301[31:0] = local_bb1_or_i300;
 assign local_bb1_shr_i282_valid_out = 1'b1;
 assign local_bb1_and4_i285_valid_out = 1'b1;
 assign local_bb1_lnot14_not_i297_valid_out = 1'b1;
 assign local_bb1_conv_i_i301_valid_out = 1'b1;
-assign local_bb1_conv17_stall_in = 1'b0;
+assign local_bb1_conv8_stall_in = 1'b0;
 
 always @(posedge clock or negedge resetn)
 begin
@@ -1707,7 +1496,7 @@ end
 wire local_bb1_var__u2_stall_local;
 wire [31:0] local_bb1_var__u2;
 
-assign local_bb1_var__u2 = local_bb1_conv21;
+assign local_bb1_var__u2 = local_bb1_conv16;
 
 // Register node:
 //  * latency = 2
@@ -2582,14 +2371,14 @@ wire local_bb1_conv_i_i45_inputs_ready;
 wire local_bb1_conv_i_i45_stall_local;
 wire [63:0] local_bb1_conv_i_i45;
 
-assign local_bb1_conv_i_i45_inputs_ready = local_bb1_conv21_valid_out_NO_SHIFT_REG;
+assign local_bb1_conv_i_i45_inputs_ready = local_bb1_conv16_valid_out_NO_SHIFT_REG;
 assign local_bb1_conv_i_i45[63:32] = 32'h0;
 assign local_bb1_conv_i_i45[31:0] = local_bb1_or_i44;
 assign local_bb1_shr_i26_valid_out = 1'b1;
 assign local_bb1_and4_i29_valid_out = 1'b1;
 assign local_bb1_lnot14_not_i41_valid_out = 1'b1;
 assign local_bb1_conv_i_i45_valid_out = 1'b1;
-assign local_bb1_conv21_stall_in = 1'b0;
+assign local_bb1_conv16_stall_in = 1'b0;
 
 always @(posedge clock or negedge resetn)
 begin
@@ -11537,42 +11326,42 @@ assign rnode_186to187_bb1_lor_ext_i_0_stall_in_NO_SHIFT_REG = 1'b0;
 
 // This section implements a registered operation.
 // 
-wire local_bb1_conv24_i32_inputs_ready;
- reg local_bb1_conv24_i32_valid_out_NO_SHIFT_REG;
-wire local_bb1_conv24_i32_stall_in;
-wire local_bb1_conv24_i32_output_regs_ready;
-wire [31:0] local_bb1_conv24_i32;
- reg local_bb1_conv24_i32_valid_pipe_0_NO_SHIFT_REG;
- reg local_bb1_conv24_i32_valid_pipe_1_NO_SHIFT_REG;
-wire local_bb1_conv24_i32_causedstall;
+wire local_bb1_conv19_i32_inputs_ready;
+ reg local_bb1_conv19_i32_valid_out_NO_SHIFT_REG;
+wire local_bb1_conv19_i32_stall_in;
+wire local_bb1_conv19_i32_output_regs_ready;
+wire [31:0] local_bb1_conv19_i32;
+ reg local_bb1_conv19_i32_valid_pipe_0_NO_SHIFT_REG;
+ reg local_bb1_conv19_i32_valid_pipe_1_NO_SHIFT_REG;
+wire local_bb1_conv19_i32_causedstall;
 
-acl_fp_fptoui fp_module_local_bb1_conv24_i32 (
+acl_fp_fptoui fp_module_local_bb1_conv19_i32 (
 	.clock(clock),
 	.resetn(resetn),
 	.dataa(local_bb1_var__u36),
-	.enable(local_bb1_conv24_i32_output_regs_ready),
-	.result(local_bb1_conv24_i32)
+	.enable(local_bb1_conv19_i32_output_regs_ready),
+	.result(local_bb1_conv19_i32)
 );
 
 
-assign local_bb1_conv24_i32_inputs_ready = 1'b1;
-assign local_bb1_conv24_i32_output_regs_ready = 1'b1;
+assign local_bb1_conv19_i32_inputs_ready = 1'b1;
+assign local_bb1_conv19_i32_output_regs_ready = 1'b1;
 assign local_bb1_var__u36_stall_in = 1'b0;
-assign local_bb1_conv24_i32_causedstall = (1'b1 && (1'b0 && !(1'b0)));
+assign local_bb1_conv19_i32_causedstall = (1'b1 && (1'b0 && !(1'b0)));
 
 always @(posedge clock or negedge resetn)
 begin
 	if (~(resetn))
 	begin
-		local_bb1_conv24_i32_valid_pipe_0_NO_SHIFT_REG <= 1'b0;
-		local_bb1_conv24_i32_valid_pipe_1_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv19_i32_valid_pipe_0_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv19_i32_valid_pipe_1_NO_SHIFT_REG <= 1'b0;
 	end
 	else
 	begin
-		if (local_bb1_conv24_i32_output_regs_ready)
+		if (local_bb1_conv19_i32_output_regs_ready)
 		begin
-			local_bb1_conv24_i32_valid_pipe_0_NO_SHIFT_REG <= 1'b1;
-			local_bb1_conv24_i32_valid_pipe_1_NO_SHIFT_REG <= local_bb1_conv24_i32_valid_pipe_0_NO_SHIFT_REG;
+			local_bb1_conv19_i32_valid_pipe_0_NO_SHIFT_REG <= 1'b1;
+			local_bb1_conv19_i32_valid_pipe_1_NO_SHIFT_REG <= local_bb1_conv19_i32_valid_pipe_0_NO_SHIFT_REG;
 		end
 	end
 end
@@ -11581,19 +11370,19 @@ always @(posedge clock or negedge resetn)
 begin
 	if (~(resetn))
 	begin
-		local_bb1_conv24_i32_valid_out_NO_SHIFT_REG <= 1'b0;
+		local_bb1_conv19_i32_valid_out_NO_SHIFT_REG <= 1'b0;
 	end
 	else
 	begin
-		if (local_bb1_conv24_i32_output_regs_ready)
+		if (local_bb1_conv19_i32_output_regs_ready)
 		begin
-			local_bb1_conv24_i32_valid_out_NO_SHIFT_REG <= 1'b1;
+			local_bb1_conv19_i32_valid_out_NO_SHIFT_REG <= 1'b1;
 		end
 		else
 		begin
-			if (~(local_bb1_conv24_i32_stall_in))
+			if (~(local_bb1_conv19_i32_stall_in))
 			begin
-				local_bb1_conv24_i32_valid_out_NO_SHIFT_REG <= 1'b0;
+				local_bb1_conv19_i32_valid_out_NO_SHIFT_REG <= 1'b0;
 			end
 		end
 	end
@@ -11602,10 +11391,10 @@ end
 
 // This section implements an unregistered operation.
 // 
-wire local_bb1_conv24_i32_trunc_stall_local;
-wire [7:0] local_bb1_conv24_i32_trunc;
+wire local_bb1_conv19_i32_trunc_stall_local;
+wire [7:0] local_bb1_conv19_i32_trunc;
 
-assign local_bb1_conv24_i32_trunc = local_bb1_conv24_i32[7:0];
+assign local_bb1_conv19_i32_trunc = local_bb1_conv19_i32[7:0];
 
 // This section implements an unregistered operation.
 // 
@@ -11615,11 +11404,11 @@ wire local_bb1_c0_exi1_inputs_ready;
 wire local_bb1_c0_exi1_stall_local;
 wire [15:0] local_bb1_c0_exi1;
 
-assign local_bb1_c0_exi1_inputs_ready = local_bb1_conv24_i32_valid_out_NO_SHIFT_REG;
+assign local_bb1_c0_exi1_inputs_ready = local_bb1_conv19_i32_valid_out_NO_SHIFT_REG;
 assign local_bb1_c0_exi1[7:0] = 8'bxxxxxxxx;
-assign local_bb1_c0_exi1[15:8] = local_bb1_conv24_i32_trunc;
+assign local_bb1_c0_exi1[15:8] = local_bb1_conv19_i32_trunc;
 assign local_bb1_c0_exi1_valid_out = 1'b1;
-assign local_bb1_conv24_i32_stall_in = 1'b0;
+assign local_bb1_conv19_i32_stall_in = 1'b0;
 
 // This section implements a registered operation.
 // 
@@ -11710,15 +11499,15 @@ lsu_top lsu_local_bb1_st_c0_exe1 (
 	.clock2x(clock2x),
 	.resetn(resetn),
 	.flush(start),
-	.stream_base_addr(),
-	.stream_size(),
-	.stream_reset(),
+	.stream_base_addr(local_bb1_arrayidx21),
+	.stream_size(input_global_size_0),
+	.stream_reset(valid_in),
 	.o_stall(local_bb1_st_c0_exe1_fu_stall_out),
 	.i_valid(local_bb1_st_c0_exe1_inputs_ready),
-	.i_address(local_bb1_arrayidx26),
+	.i_address(local_bb1_arrayidx21),
 	.i_writedata(local_bb1_c0_exe1),
 	.i_cmpdata(),
-	.i_predicate(rnode_194to195_bb1_or_cond_xor_0_NO_SHIFT_REG),
+	.i_predicate(1'b0),
 	.i_bitwiseor(64'h0),
 	.i_byteenable(),
 	.i_stall(~(local_bb1_st_c0_exe1_output_regs_ready)),
@@ -11741,7 +11530,7 @@ lsu_top lsu_local_bb1_st_c0_exe1 (
 	.profile_bw(profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl),
 	.profile_bw_incr(profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr),
 	.profile_total_ivalid(profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl),
-	.profile_total_req(profile_lsu_local_bb1_st_c0_exe1_profile_total_req_cntl),
+	.profile_total_req(),
 	.profile_i_stall_count(),
 	.profile_o_stall_count(),
 	.profile_avm_readwrite_count(profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl),
@@ -11763,8 +11552,8 @@ defparam lsu_local_bb1_st_c0_exe1.WIDTH = 8;
 defparam lsu_local_bb1_st_c0_exe1.MWIDTH = 256;
 defparam lsu_local_bb1_st_c0_exe1.ATOMIC_WIDTH = 3;
 defparam lsu_local_bb1_st_c0_exe1.BURSTCOUNT_WIDTH = 5;
-defparam lsu_local_bb1_st_c0_exe1.KERNEL_SIDE_MEM_LATENCY = 4;
-defparam lsu_local_bb1_st_c0_exe1.MEMORY_SIDE_MEM_LATENCY = 8;
+defparam lsu_local_bb1_st_c0_exe1.KERNEL_SIDE_MEM_LATENCY = 2;
+defparam lsu_local_bb1_st_c0_exe1.MEMORY_SIDE_MEM_LATENCY = 0;
 defparam lsu_local_bb1_st_c0_exe1.USE_WRITE_ACK = 0;
 defparam lsu_local_bb1_st_c0_exe1.ENABLE_BANKED_MEMORY = 0;
 defparam lsu_local_bb1_st_c0_exe1.ABITS_PER_LMEM_BANK = 0;
@@ -11778,14 +11567,13 @@ defparam lsu_local_bb1_st_c0_exe1.HIGH_FMAX = 1;
 defparam lsu_local_bb1_st_c0_exe1.ACL_PROFILE = 1;
 defparam lsu_local_bb1_st_c0_exe1.ACL_PROFILE_INCREMENT_WIDTH = 32;
 defparam lsu_local_bb1_st_c0_exe1.ADDRSPACE = 1;
-defparam lsu_local_bb1_st_c0_exe1.STYLE = "BURST-COALESCED";
+defparam lsu_local_bb1_st_c0_exe1.STYLE = "STREAMING";
 defparam lsu_local_bb1_st_c0_exe1.USE_BYTE_EN = 0;
 
-assign local_bb1_st_c0_exe1_inputs_ready = (local_bb1_c0_exe1_valid_out & local_bb1_arrayidx26_valid_out & rnode_194to195_bb1_or_cond_xor_0_valid_out_NO_SHIFT_REG);
+assign local_bb1_st_c0_exe1_inputs_ready = (local_bb1_c0_exe1_valid_out & local_bb1_arrayidx21_valid_out);
 assign local_bb1_st_c0_exe1_output_regs_ready = (&(~(local_bb1_st_c0_exe1_valid_out_NO_SHIFT_REG) | ~(local_bb1_st_c0_exe1_stall_in)));
 assign local_bb1_c0_exe1_stall_in = (local_bb1_st_c0_exe1_fu_stall_out | ~(local_bb1_st_c0_exe1_inputs_ready));
-assign local_bb1_arrayidx26_stall_in = (local_bb1_st_c0_exe1_fu_stall_out | ~(local_bb1_st_c0_exe1_inputs_ready));
-assign rnode_194to195_bb1_or_cond_xor_0_stall_in_NO_SHIFT_REG = (local_bb1_st_c0_exe1_fu_stall_out | ~(local_bb1_st_c0_exe1_inputs_ready));
+assign local_bb1_arrayidx21_stall_in = (local_bb1_st_c0_exe1_fu_stall_out | ~(local_bb1_st_c0_exe1_inputs_ready));
 assign local_bb1_st_c0_exe1_causedstall = (local_bb1_st_c0_exe1_inputs_ready && (local_bb1_st_c0_exe1_fu_stall_out && !(~(local_bb1_st_c0_exe1_output_regs_ready))));
 
 always @(posedge clock or negedge resetn)
@@ -11813,37 +11601,37 @@ end
 
 // This section implements a staging register.
 // 
-wire rstag_199to199_bb1_st_c0_exe1_valid_out;
-wire rstag_199to199_bb1_st_c0_exe1_stall_in;
-wire rstag_199to199_bb1_st_c0_exe1_inputs_ready;
-wire rstag_199to199_bb1_st_c0_exe1_stall_local;
- reg rstag_199to199_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG;
-wire rstag_199to199_bb1_st_c0_exe1_combined_valid;
+wire rstag_197to197_bb1_st_c0_exe1_valid_out;
+wire rstag_197to197_bb1_st_c0_exe1_stall_in;
+wire rstag_197to197_bb1_st_c0_exe1_inputs_ready;
+wire rstag_197to197_bb1_st_c0_exe1_stall_local;
+ reg rstag_197to197_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG;
+wire rstag_197to197_bb1_st_c0_exe1_combined_valid;
 
-assign rstag_199to199_bb1_st_c0_exe1_inputs_ready = local_bb1_st_c0_exe1_valid_out_NO_SHIFT_REG;
-assign rstag_199to199_bb1_st_c0_exe1_combined_valid = (rstag_199to199_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG | rstag_199to199_bb1_st_c0_exe1_inputs_ready);
-assign rstag_199to199_bb1_st_c0_exe1_valid_out = rstag_199to199_bb1_st_c0_exe1_combined_valid;
-assign rstag_199to199_bb1_st_c0_exe1_stall_local = rstag_199to199_bb1_st_c0_exe1_stall_in;
-assign local_bb1_st_c0_exe1_stall_in = (|rstag_199to199_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG);
+assign rstag_197to197_bb1_st_c0_exe1_inputs_ready = local_bb1_st_c0_exe1_valid_out_NO_SHIFT_REG;
+assign rstag_197to197_bb1_st_c0_exe1_combined_valid = (rstag_197to197_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG | rstag_197to197_bb1_st_c0_exe1_inputs_ready);
+assign rstag_197to197_bb1_st_c0_exe1_valid_out = rstag_197to197_bb1_st_c0_exe1_combined_valid;
+assign rstag_197to197_bb1_st_c0_exe1_stall_local = rstag_197to197_bb1_st_c0_exe1_stall_in;
+assign local_bb1_st_c0_exe1_stall_in = (|rstag_197to197_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG);
 
 always @(posedge clock or negedge resetn)
 begin
 	if (~(resetn))
 	begin
-		rstag_199to199_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG <= 1'b0;
+		rstag_197to197_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG <= 1'b0;
 	end
 	else
 	begin
-		if (rstag_199to199_bb1_st_c0_exe1_stall_local)
+		if (rstag_197to197_bb1_st_c0_exe1_stall_local)
 		begin
-			if (~(rstag_199to199_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG))
+			if (~(rstag_197to197_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG))
 			begin
-				rstag_199to199_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG <= rstag_199to199_bb1_st_c0_exe1_inputs_ready;
+				rstag_197to197_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG <= rstag_197to197_bb1_st_c0_exe1_inputs_ready;
 			end
 		end
 		else
 		begin
-			rstag_199to199_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG <= 1'b0;
+			rstag_197to197_bb1_st_c0_exe1_staging_valid_NO_SHIFT_REG <= 1'b0;
 		end
 	end
 end
@@ -11853,9 +11641,9 @@ end
 wire branch_var__inputs_ready;
 wire branch_var__output_regs_ready;
 
-assign branch_var__inputs_ready = rstag_199to199_bb1_st_c0_exe1_valid_out;
+assign branch_var__inputs_ready = rstag_197to197_bb1_st_c0_exe1_valid_out;
 assign branch_var__output_regs_ready = ~(stall_in);
-assign rstag_199to199_bb1_st_c0_exe1_stall_in = (~(branch_var__output_regs_ready) | ~(branch_var__inputs_ready));
+assign rstag_197to197_bb1_st_c0_exe1_stall_in = (~(branch_var__output_regs_ready) | ~(branch_var__inputs_ready));
 assign valid_out = branch_var__inputs_ready;
 
 endmodule
@@ -11871,7 +11659,6 @@ module GreyScale_function
 		input 		clock,
 		input 		resetn,
 		input [31:0] 		input_global_id_0,
-		input [31:0] 		input_global_id_1,
 		output 		stall_out,
 		input 		valid_in,
 		output 		valid_out,
@@ -11890,7 +11677,6 @@ module GreyScale_function
 		output 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_cntl,
 		output [31:0] 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_incr,
 		output 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_ivalid_cntl,
-		output 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_req_cntl,
 		output 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_readwrite_count_cntl,
 		output 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_cntl,
 		output [31:0] 		profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_incr,
@@ -11909,7 +11695,6 @@ module GreyScale_function
 		output 		profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl,
 		output [31:0] 		profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr,
 		output 		profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl,
-		output 		profile_lsu_local_bb1_st_c0_exe1_profile_total_req_cntl,
 		output 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl,
 		output 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl,
 		output [31:0] 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr,
@@ -11918,6 +11703,7 @@ module GreyScale_function
 		input 		clock2x,
 		input [63:0] 		input_grayImage,
 		input [63:0] 		input_rgbImage,
+		input [31:0] 		input_global_size_0,
 		output 		profile_clock,
 		output reg 		has_a_write_pending,
 		output reg 		has_a_lsu_active
@@ -11928,7 +11714,6 @@ wire [31:0] cur_cycle;
 wire bb_0_stall_out;
 wire bb_0_valid_out;
 wire [31:0] bb_0_lvb_input_global_id_0;
-wire [31:0] bb_0_lvb_input_global_id_1;
 wire bb_1_stall_out;
 wire bb_1_valid_out;
 wire bb_1_local_bb1_ld_memcoalesce_rgbImage_load_0_active;
@@ -11943,11 +11728,9 @@ GreyScale_basic_block_0 GreyScale_basic_block_0 (
 	.valid_in(valid_in),
 	.stall_out(bb_0_stall_out),
 	.input_global_id_0(input_global_id_0),
-	.input_global_id_1(input_global_id_1),
 	.valid_out(bb_0_valid_out),
 	.stall_in(bb_1_stall_out),
 	.lvb_input_global_id_0(bb_0_lvb_input_global_id_0),
-	.lvb_input_global_id_1(bb_0_lvb_input_global_id_1),
 	.workgroup_size(workgroup_size)
 );
 
@@ -11957,10 +11740,10 @@ GreyScale_basic_block_1 GreyScale_basic_block_1 (
 	.resetn(resetn),
 	.input_grayImage(input_grayImage),
 	.input_rgbImage(input_rgbImage),
+	.input_global_size_0(input_global_size_0),
 	.valid_in(bb_0_valid_out),
 	.stall_out(bb_1_stall_out),
 	.input_global_id_0(bb_0_lvb_input_global_id_0),
-	.input_global_id_1(bb_0_lvb_input_global_id_1),
 	.valid_out(bb_1_valid_out),
 	.stall_in(stall_in),
 	.workgroup_size(workgroup_size),
@@ -11978,7 +11761,6 @@ GreyScale_basic_block_1 GreyScale_basic_block_1 (
 	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_cntl(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_cntl),
 	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_incr(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_incr),
 	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_ivalid_cntl(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_ivalid_cntl),
-	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_req_cntl(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_req_cntl),
 	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_readwrite_count_cntl(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_readwrite_count_cntl),
 	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_cntl(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_cntl),
 	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_incr(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_incr),
@@ -11999,7 +11781,6 @@ GreyScale_basic_block_1 GreyScale_basic_block_1 (
 	.profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl),
 	.profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr(profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr),
 	.profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl),
-	.profile_lsu_local_bb1_st_c0_exe1_profile_total_req_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_total_req_cntl),
 	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl),
 	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl),
 	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr(profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr),
@@ -12142,8 +11923,8 @@ wire [63:0] profile_data_wire;
 wire profile_shift_wire;
 wire profile_reset_n_wire;
 wire profile_enable_wire;
-wire [17:0] profile_increment_cntl;
-wire [575:0] profile_increment_val;
+wire [15:0] profile_increment_cntl;
+wire [511:0] profile_increment_val;
 
 acl_profiler profiler_inst (
 	.clock(clock),
@@ -12157,7 +11938,7 @@ acl_profiler profiler_inst (
 
 defparam profiler_inst.COUNTER_WIDTH = 64;
 defparam profiler_inst.INCREMENT_WIDTH = 32;
-defparam profiler_inst.NUM_COUNTERS = 18;
+defparam profiler_inst.NUM_COUNTERS = 16;
 defparam profiler_inst.DAISY_WIDTH = 64;
 
 
@@ -12531,7 +12312,6 @@ acl_id_iterator id_iter_inst0 (
 wire profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_cntl_inst0_wire_0;
 wire [31:0] profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_incr_inst0_wire_0;
 wire profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_ivalid_cntl_inst0_wire_0;
-wire profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_req_cntl_inst0_wire_0;
 wire profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_readwrite_count_cntl_inst0_wire_0;
 wire profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_cntl_inst0_wire_0;
 wire [31:0] profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_incr_inst0_wire_0;
@@ -12540,7 +12320,6 @@ wire profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_stall_cntl
 wire profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl_inst0_wire_0;
 wire [31:0] profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr_inst0_wire_0;
 wire profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl_inst0_wire_0;
-wire profile_lsu_local_bb1_st_c0_exe1_profile_total_req_cntl_inst0_wire_0;
 wire profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl_inst0_wire_0;
 wire profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl_inst0_wire_0;
 wire [31:0] profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr_inst0_wire_0;
@@ -12551,7 +12330,6 @@ GreyScale_function GreyScale_function_inst0 (
 	.clock(clock),
 	.resetn(resetn),
 	.input_global_id_0(global_id[0][0]),
-	.input_global_id_1(global_id[0][1]),
 	.stall_out(stall_out),
 	.valid_in(valid_in),
 	.valid_out(valid_out),
@@ -12570,7 +12348,6 @@ GreyScale_function GreyScale_function_inst0 (
 	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_cntl(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_cntl_inst0_wire_0),
 	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_incr(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_incr_inst0_wire_0),
 	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_ivalid_cntl(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_ivalid_cntl_inst0_wire_0),
-	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_req_cntl(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_req_cntl_inst0_wire_0),
 	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_readwrite_count_cntl(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_readwrite_count_cntl_inst0_wire_0),
 	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_cntl(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_cntl_inst0_wire_0),
 	.profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_incr(profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_incr_inst0_wire_0),
@@ -12589,7 +12366,6 @@ GreyScale_function GreyScale_function_inst0 (
 	.profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl_inst0_wire_0),
 	.profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr(profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr_inst0_wire_0),
 	.profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl_inst0_wire_0),
-	.profile_lsu_local_bb1_st_c0_exe1_profile_total_req_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_total_req_cntl_inst0_wire_0),
 	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl_inst0_wire_0),
 	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl_inst0_wire_0),
 	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr(profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr_inst0_wire_0),
@@ -12598,6 +12374,7 @@ GreyScale_function GreyScale_function_inst0 (
 	.clock2x(clock2x),
 	.input_grayImage(kernel_arguments_NO_SHIFT_REG[63:0]),
 	.input_rgbImage(kernel_arguments_NO_SHIFT_REG[127:64]),
+	.input_global_size_0(global_size_NO_SHIFT_REG[0]),
 	.profile_clock(profile_clock_inst0_wire_0),
 	.has_a_write_pending(has_a_write_pending),
 	.has_a_lsu_active(has_a_lsu_active)
@@ -12608,38 +12385,34 @@ assign profile_increment_cntl[0] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage
 assign profile_increment_val[31:0] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_incr_inst0_wire_0;
 assign profile_increment_cntl[1] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_ivalid_cntl_inst0_wire_0;
 assign profile_increment_val[63:32] = 32'h1;
-assign profile_increment_cntl[2] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_req_cntl_inst0_wire_0;
+assign profile_increment_cntl[2] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_readwrite_count_cntl_inst0_wire_0;
 assign profile_increment_val[95:64] = 32'h1;
-assign profile_increment_cntl[3] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_readwrite_count_cntl_inst0_wire_0;
-assign profile_increment_val[127:96] = 32'h1;
-assign profile_increment_cntl[4] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_cntl_inst0_wire_0;
-assign profile_increment_val[159:128] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_incr_inst0_wire_0;
-assign profile_increment_cntl[5] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_extra_unaligned_reqs_cntl_inst0_wire_0;
+assign profile_increment_cntl[3] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_cntl_inst0_wire_0;
+assign profile_increment_val[127:96] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_incr_inst0_wire_0;
+assign profile_increment_cntl[4] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_extra_unaligned_reqs_cntl_inst0_wire_0;
+assign profile_increment_val[159:128] = 32'h1;
+assign profile_increment_cntl[5] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_stall_cntl_inst0_wire_0;
 assign profile_increment_val[191:160] = 32'h1;
-assign profile_increment_cntl[6] = profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_stall_cntl_inst0_wire_0;
-assign profile_increment_val[223:192] = 32'h1;
-assign profile_increment_cntl[7] = profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl_inst0_wire_0;
-assign profile_increment_val[255:224] = profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr_inst0_wire_0;
-assign profile_increment_cntl[8] = profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl_inst0_wire_0;
+assign profile_increment_cntl[6] = profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl_inst0_wire_0;
+assign profile_increment_val[223:192] = profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr_inst0_wire_0;
+assign profile_increment_cntl[7] = profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl_inst0_wire_0;
+assign profile_increment_val[255:224] = 32'h1;
+assign profile_increment_cntl[8] = profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl_inst0_wire_0;
 assign profile_increment_val[287:256] = 32'h1;
-assign profile_increment_cntl[9] = profile_lsu_local_bb1_st_c0_exe1_profile_total_req_cntl_inst0_wire_0;
-assign profile_increment_val[319:288] = 32'h1;
-assign profile_increment_cntl[10] = profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl_inst0_wire_0;
+assign profile_increment_cntl[9] = profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl_inst0_wire_0;
+assign profile_increment_val[319:288] = profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr_inst0_wire_0;
+assign profile_increment_cntl[10] = profile_lsu_local_bb1_st_c0_exe1_profile_avm_stall_cntl_inst0_wire_0;
 assign profile_increment_val[351:320] = 32'h1;
-assign profile_increment_cntl[11] = profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl_inst0_wire_0;
-assign profile_increment_val[383:352] = profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr_inst0_wire_0;
-assign profile_increment_cntl[12] = profile_lsu_local_bb1_st_c0_exe1_profile_avm_stall_cntl_inst0_wire_0;
+assign profile_increment_cntl[11] = profile_clock_inst0_wire_0;
+assign profile_increment_val[383:352] = 32'h1;
+assign profile_increment_cntl[12] = profile_extmem_GreyScale_function_bank0_port0_read_data_inc_en;
 assign profile_increment_val[415:384] = 32'h1;
-assign profile_increment_cntl[13] = profile_clock_inst0_wire_0;
+assign profile_increment_cntl[13] = profile_extmem_GreyScale_function_bank0_port0_read_burst_count_en;
 assign profile_increment_val[447:416] = 32'h1;
-assign profile_increment_cntl[14] = profile_extmem_GreyScale_function_bank0_port0_read_data_inc_en;
+assign profile_increment_cntl[14] = profile_extmem_GreyScale_function_bank0_port0_write_data_inc_en;
 assign profile_increment_val[479:448] = 32'h1;
-assign profile_increment_cntl[15] = profile_extmem_GreyScale_function_bank0_port0_read_burst_count_en;
+assign profile_increment_cntl[15] = profile_extmem_GreyScale_function_bank0_port0_write_burst_count_en;
 assign profile_increment_val[511:480] = 32'h1;
-assign profile_increment_cntl[16] = profile_extmem_GreyScale_function_bank0_port0_write_data_inc_en;
-assign profile_increment_val[543:512] = 32'h1;
-assign profile_increment_cntl[17] = profile_extmem_GreyScale_function_bank0_port0_write_burst_count_en;
-assign profile_increment_val[575:544] = 32'h1;
 
 endmodule
 

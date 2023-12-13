@@ -42,22 +42,20 @@
 	</PORT_LIST>
 	<MODULEINST_LIST>
 		<MODULEINST name="lsu_local_bb1_ld_memcoalesce_rgbImage_load_0" function="GreyScale" module="lsu_top" attribute="__global;read;BURST-NON-ALIGNED;MEMORY;32;256;_coalesced">
-			<DEBUG file="/home/uc2019231352@student.uc.pt/CHAD/Lab_7/ex3/device/GreyScale.cl" line="24" column="38">
+			<DEBUG file="/home/uc2019231352@student.uc.pt/CHAD/Lab_7/ex3/device/GreyScale.cl" line="19" column="2">
 			</DEBUG>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_cntl" incr_name="profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_bw_incr" port_tag="bandwidth"/>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_ivalid_cntl" incr_name="" port_tag="ivalid"/>
-			<SIGNAL cntl_name="profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_total_req_cntl" incr_name="" port_tag="totalreq"/>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_readwrite_count_cntl" incr_name="" port_tag="readwritecount"/>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_cntl" incr_name="profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_burstcount_total_incr" port_tag="burstcount"/>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_extra_unaligned_reqs_cntl" incr_name="" port_tag="unalignedrequests"/>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_ld_memcoalesce_rgbImage_load_0_profile_avm_stall_cntl" incr_name="" port_tag="memorystalls"/>
 		</MODULEINST>
-		<MODULEINST name="lsu_local_bb1_st_c0_exe1" function="GreyScale" module="lsu_top" attribute="__global;write;BURST-COALESCED;MEMORY;8;256;unoptimized">
-			<DEBUG file="/home/uc2019231352@student.uc.pt/CHAD/Lab_7/ex3/device/GreyScale.cl" line="32" column="3">
+		<MODULEINST name="lsu_local_bb1_st_c0_exe1" function="GreyScale" module="lsu_top" attribute="__global;write;STREAMING;MEMORY;8;256;unoptimized">
+			<DEBUG file="/home/uc2019231352@student.uc.pt/CHAD/Lab_7/ex3/device/GreyScale.cl" line="19" column="2">
 			</DEBUG>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl" incr_name="profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr" port_tag="bandwidth"/>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl" incr_name="" port_tag="ivalid"/>
-			<SIGNAL cntl_name="profile_lsu_local_bb1_st_c0_exe1_profile_total_req_cntl" incr_name="" port_tag="totalreq"/>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl" incr_name="" port_tag="readwritecount"/>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl" incr_name="profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr" port_tag="burstcount"/>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_st_c0_exe1_profile_avm_stall_cntl" incr_name="" port_tag="memorystalls"/>
@@ -75,14 +73,12 @@
 	<CONNECTION_LIST>
 		<CONNECTION moduleinst="lsu_local_bb1_ld_memcoalesce_rgbImage_load_0" function="GreyScale" compute_unit="0" port_tag="bandwidth"/>
 		<CONNECTION moduleinst="lsu_local_bb1_ld_memcoalesce_rgbImage_load_0" function="GreyScale" compute_unit="0" port_tag="ivalid"/>
-		<CONNECTION moduleinst="lsu_local_bb1_ld_memcoalesce_rgbImage_load_0" function="GreyScale" compute_unit="0" port_tag="totalreq"/>
 		<CONNECTION moduleinst="lsu_local_bb1_ld_memcoalesce_rgbImage_load_0" function="GreyScale" compute_unit="0" port_tag="readwritecount"/>
 		<CONNECTION moduleinst="lsu_local_bb1_ld_memcoalesce_rgbImage_load_0" function="GreyScale" compute_unit="0" port_tag="burstcount"/>
 		<CONNECTION moduleinst="lsu_local_bb1_ld_memcoalesce_rgbImage_load_0" function="GreyScale" compute_unit="0" port_tag="unalignedrequests"/>
 		<CONNECTION moduleinst="lsu_local_bb1_ld_memcoalesce_rgbImage_load_0" function="GreyScale" compute_unit="0" port_tag="memorystalls"/>
 		<CONNECTION moduleinst="lsu_local_bb1_st_c0_exe1" function="GreyScale" compute_unit="0" port_tag="bandwidth"/>
 		<CONNECTION moduleinst="lsu_local_bb1_st_c0_exe1" function="GreyScale" compute_unit="0" port_tag="ivalid"/>
-		<CONNECTION moduleinst="lsu_local_bb1_st_c0_exe1" function="GreyScale" compute_unit="0" port_tag="totalreq"/>
 		<CONNECTION moduleinst="lsu_local_bb1_st_c0_exe1" function="GreyScale" compute_unit="0" port_tag="readwritecount"/>
 		<CONNECTION moduleinst="lsu_local_bb1_st_c0_exe1" function="GreyScale" compute_unit="0" port_tag="burstcount"/>
 		<CONNECTION moduleinst="lsu_local_bb1_st_c0_exe1" function="GreyScale" compute_unit="0" port_tag="memorystalls"/>

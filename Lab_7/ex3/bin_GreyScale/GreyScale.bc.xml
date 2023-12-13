@@ -1,6 +1,6 @@
 <KERNEL_LIST>
 	<PROGRAM_GLOBAL_MEM_SIZE value="0" />
-	<KERNEL name="GreyScale" filename="GreyScale.v" version="1" enable_global_profiling="1" workgroup_invariant="1" has_global_atomics="0" num_vector_lanes="1" num_profiling_signals="18">
+	<KERNEL name="GreyScale" filename="GreyScale.v" version="1" enable_global_profiling="1" workgroup_invariant="1" has_global_atomics="0" num_vector_lanes="1" num_profiling_signals="16">
 		<RESOURCE_INFO>
 			<ID value="0" />
 			<AGGREGATE_STATIC_LOCAL_MEM_SIZE value="0" />
@@ -24,7 +24,6 @@
 			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_ll_fifo.v" />
 			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_ll_ram_fifo.v" />
 			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_loop_limiter.v" />
-			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_multi_fanout_adaptor.v" />
 			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_multistage_accumulator.v" />
 			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_multistage_adder.v" />
 			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_profiler.v" />

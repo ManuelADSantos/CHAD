@@ -39,7 +39,7 @@
                   , "id2":14
                   , "name":"Load"
                   , "file":"1"
-                  , "line":"24"
+                  , "line":"19"
                   , "order":2
                   , "details":
                   {
@@ -54,12 +54,12 @@
                   , "id2":15
                   , "name":"Store"
                   , "file":"1"
-                  , "line":"32"
+                  , "line":"19"
                   , "order":195
                   , "details":
                   {
                     "Width":"8 bits"
-                    , "Type":"Burst-coalesced"
+                    , "Type":"Streaming"
                     , "Stall-free":"No"
                   }
                 }
