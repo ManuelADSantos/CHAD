@@ -10,6 +10,12 @@
 // Image read libraries
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+/*#define STBI_MALLOC
+#define STBI_REALLOC
+#define STBI_FREE */
+#define STBI_MSC_SECURE_CRT
+#define STBI_ONLY_JPEG
+
 #include "lib/stb_image.h"
 #include "lib/stb_image_write.h"
 // OpenCL libraries
@@ -33,8 +39,8 @@ scoped_array<cl_kernel> kernel;
 
 
 // Problem dimensions
-#define WIDTH 512
-#define HEIGHT 512
+#define WIDTH 64
+#define HEIGHT 64
 #define CHANNELS 3
 const unsigned N = WIDTH*HEIGHT;
 
@@ -67,6 +73,7 @@ int main()
   // Initialize the problem data.
   // Requires the number of devices to be known.
   init_problem();
+  return 0;
 
   // Run the kernel.
   run();
@@ -181,6 +188,7 @@ void init_problem()
       exit(1);
   }
 
+
   // Generate input vectors A and B and the reference output consisting
   // of a total of N elements.
   // We create separate arrays for each device so that each device has an
@@ -190,28 +198,39 @@ void init_problem()
     host_img_rgb[i].reset(n_per_device[i]);
     host_img_gray[i].reset(n_per_device[i]);
     
-    printf("Dados | num_devices = %d\n", num_devices);
+    printf("Dados | num_devices = %d | n_per_devices = %d\n", num_devices, n_per_device[i]);
     
-    // Popular matriz
+    // Popular matriz (512*512 = 262 144)
     for(unsigned j = 0; j < n_per_device[i]; ++j) 
     {
       //printf("Entrou\n");
       
       //printf("Red done\n");
       host_img_rgb[i][3*j+0] = img_rgb_object[i*n_per_device[i] + (3*j+0)];
+      //printf("R = %d\n", host_img_rgb[i][3*j+0]);
       //printf("Green done\n");
       host_img_rgb[i][3*j+1] = img_rgb_object[i*n_per_device[i] + (3*j+1)];
       //printf("Blue done\n");
       host_img_rgb[i][3*j+2] = img_rgb_object[i*n_per_device[i] + (3*j+2)];
+      //printf("Pixel %d = %d %d %d\n", j, host_img_rgb[i][3*j+0], host_img_rgb[i][3*j+1], host_img_rgb[i][3*j+2]);
+      
     }
     
     printf("init_problem function was sucessfull\n");
   }
+
+  //unsigned char *img_gray_object = stbi_load("image.jpg", &width, &height, &n, 0);
+
+  //printf("Size of host_img_rgb[0] = %d\n", sizeof(host_img_rgb[0]));
+
+  exit(1);
+  
 }
 
 // This function is used to verify the results.
 void run()
 {
+  printf("Entering run function\n");
   cl_int status;
 
   const double start_time = getCurrentTimestamp();
@@ -220,7 +239,11 @@ void run()
   scoped_array<cl_event> kernel_event(num_devices);
   scoped_array<cl_event> finish_event(num_devices);
 
-  for(unsigned i = 0; i < num_devices; ++i) {
+  printf("Events launched\n");
+
+  for(unsigned i = 0; i < num_devices; ++i) 
+  {
+    printf("Entering for\n");
 
     // Transfer inputs to each device. Each of the host buffers supplied to
     // clEnqueueWriteBuffer here is already aligned to ensure that DMA is used
@@ -228,6 +251,8 @@ void run()
     cl_event write_event[1];
     status = clEnqueueWriteBuffer(queue[i], buffer_img_RGB[i], CL_FALSE, 0, n_per_device[i] * CHANNELS * sizeof(unsigned char), host_img_rgb[i], 0, NULL, &write_event[0]);
     checkError(status, "Failed to transfer input A");
+
+    printf("Inputs transfered\n");
 
     // Set kernel arguments.
     unsigned argi = 0;
@@ -238,6 +263,7 @@ void run()
     status = clSetKernelArg(kernel[i], argi++, sizeof(cl_mem), &buffer_img_GRAY[i]);
     checkError(status, "Failed to set argument %d", argi - 1);
 
+    printf("Argumets setted\n");
     // Enqueue kernel.
     // Use a global work size corresponding to the number of elements to add
     // for this device.

@@ -119,6 +119,9 @@ int main(int argc, char *argv[])
     // ===== Free Device Memory
     cudaFree(Dev_Input_Image);
     cudaFree(Dev_Output_Image);
+
+    free(image);    
+    free(output);
     
     return 0;
 }
