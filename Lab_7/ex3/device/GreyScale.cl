@@ -7,8 +7,8 @@
 // This file contains the kernel function that performs the filter.
 // ============================================================================
 
-__kernel void GreyScale(__global unsigned char * grayImage,
-						__global const unsigned char * rgbImage)
+__kernel void GreyScale(__global const unsigned char * rgbImage,
+						__global unsigned char * grayImage)
 {
 	// Get index of the worker
 	int pixel = get_global_id(0);
