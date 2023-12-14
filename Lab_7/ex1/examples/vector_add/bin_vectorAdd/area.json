@@ -90,14 +90,44 @@
               "data":
               [
                 {
+                  "value":"vectorAdd.cl:31"
+                  , "file":1
+                  , "line":31
+                  , "colspan":2
+                }
+                , "8463"
+                , "9074"
+                , "42"
+                , "0"
+              ]
+            }
+            , {
+              "data":
+              [
+                {
+                  "value":"vectorAdd.cl:32"
+                  , "file":1
+                  , "line":32
+                  , "colspan":2
+                }
+                , "1"
+                , "1"
+                , "0"
+                , "0"
+              ]
+            }
+            , {
+              "data":
+              [
+                {
                   "value":"Unknown Line"
                   , "file":0
                   , "line":0
                   , "colspan":2
                 }
-                , "2284"
-                , "3179"
-                , "44"
+                , "540"
+                , "824"
+                , "2"
                 , "0"
               ]
             }

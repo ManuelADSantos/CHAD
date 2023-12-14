@@ -1,6 +1,6 @@
 <KERNEL_LIST>
 	<PROGRAM_GLOBAL_MEM_SIZE value="0" />
-	<KERNEL name="vectorAdd" filename="vectorAdd.v" version="1" enable_global_profiling="1" workgroup_invariant="1" has_global_atomics="0" num_vector_lanes="1" num_profiling_signals="0">
+	<KERNEL name="vectorAdd" filename="vectorAdd.v" version="1" enable_global_profiling="1" workgroup_invariant="1" has_global_atomics="0" num_vector_lanes="1" num_profiling_signals="20">
 		<RESOURCE_INFO>
 			<ID value="0" />
 			<AGGREGATE_STATIC_LOCAL_MEM_SIZE value="0" />
@@ -23,6 +23,7 @@
 			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_loop_limiter.v" />
 			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_multistage_accumulator.v" />
 			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_multistage_adder.v" />
+			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_profiler.v" />
 			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_shift_register.v" />
 			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_staging_reg.v" />
 			<FILE name="$::env(ALTERAOCLSDKROOT)/ip/acl_stall_free_sink.v" />

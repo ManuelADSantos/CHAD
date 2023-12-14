@@ -43,7 +43,7 @@
 	</PORT_LIST>
 	<MODULEINST_LIST>
 		<MODULEINST name="lsu_local_bb1_ld_" function="matMul" module="lsu_top" attribute="__global;read;BURST-COALESCED;MEMORY;32;256;unoptimized">
-			<DEBUG file="/home/uc2019231352@student.uc.pt/CHAD/Lab_7/ex2/device/matMul.cl" line="26" column="13">
+			<DEBUG file="/home/uc2019231352@student.uc.pt/CHAD/Lab_7/ex2/device/matMul.cl" line="27" column="13">
 			</DEBUG>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_ld__profile_bw_cntl" incr_name="profile_lsu_local_bb1_ld__profile_bw_incr" port_tag="bandwidth"/>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_ld__profile_total_ivalid_cntl" incr_name="" port_tag="ivalid"/>
@@ -54,7 +54,7 @@
 			<SIGNAL cntl_name="profile_lsu_local_bb1_ld__profile_avm_stall_cntl" incr_name="" port_tag="memorystalls"/>
 		</MODULEINST>
 		<MODULEINST name="lsu_local_bb1_ld__u4" function="matMul" module="lsu_top" attribute="__global;read;BURST-COALESCED;MEMORY;32;256;unoptimized">
-			<DEBUG file="/home/uc2019231352@student.uc.pt/CHAD/Lab_7/ex2/device/matMul.cl" line="26" column="13">
+			<DEBUG file="/home/uc2019231352@student.uc.pt/CHAD/Lab_7/ex2/device/matMul.cl" line="27" column="13">
 			</DEBUG>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_ld__u4_profile_bw_cntl" incr_name="profile_lsu_local_bb1_ld__u4_profile_bw_incr" port_tag="bandwidth"/>
 			<SIGNAL cntl_name="profile_lsu_local_bb1_ld__u4_profile_total_ivalid_cntl" incr_name="" port_tag="ivalid"/>
@@ -65,7 +65,7 @@
 			<SIGNAL cntl_name="profile_lsu_local_bb1_ld__u4_profile_avm_stall_cntl" incr_name="" port_tag="memorystalls"/>
 		</MODULEINST>
 		<MODULEINST name="lsu_local_bb2_st_c0_exe1" function="matMul" module="lsu_top" attribute="__global;write;BURST-COALESCED;MEMORY;32;256;unoptimized">
-			<DEBUG file="/home/uc2019231352@student.uc.pt/CHAD/Lab_7/ex2/device/matMul.cl" line="27" column="9">
+			<DEBUG file="/home/uc2019231352@student.uc.pt/CHAD/Lab_7/ex2/device/matMul.cl" line="28" column="9">
 			</DEBUG>
 			<SIGNAL cntl_name="profile_lsu_local_bb2_st_c0_exe1_profile_bw_cntl" incr_name="profile_lsu_local_bb2_st_c0_exe1_profile_bw_incr" port_tag="bandwidth"/>
 			<SIGNAL cntl_name="profile_lsu_local_bb2_st_c0_exe1_profile_total_ivalid_cntl" incr_name="" port_tag="ivalid"/>
