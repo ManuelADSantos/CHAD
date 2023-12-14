@@ -12,6 +12,7 @@
 // This file contains the kernel function that performs the matrix
 //      multiplication on the FPGA device.
 // ============================================================================
+
 __kernel void matMul(__global const float *A, __global const float *B, __global float *restrict C)
 {
     // === Get the row and column of the element

@@ -84,6 +84,7 @@ add_fileset_file acl_ll_ram_fifo.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/
 add_fileset_file acl_loop_limiter.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_loop_limiter.v TOP_LEVEL_FILE
 add_fileset_file acl_multistage_accumulator.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_multistage_accumulator.v TOP_LEVEL_FILE
 add_fileset_file acl_multistage_adder.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_multistage_adder.v TOP_LEVEL_FILE
+add_fileset_file acl_profiler.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_profiler.v TOP_LEVEL_FILE
 add_fileset_file acl_shift_register.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_shift_register.v TOP_LEVEL_FILE
 add_fileset_file acl_staging_reg.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_staging_reg.v TOP_LEVEL_FILE
 add_fileset_file acl_stall_free_sink.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_stall_free_sink.v TOP_LEVEL_FILE
@@ -123,6 +124,7 @@ add_fileset_file acl_atomics_nostall.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKRO
 add_fileset_file acl_atomics_arb_stall.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_atomics_arb_stall.v TOP_LEVEL_FILE
 add_fileset_file acl_address_to_bankaddress.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_address_to_bankaddress.v TOP_LEVEL_FILE
 add_fileset_file acl_ic_mem_router.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_ic_mem_router.v TOP_LEVEL_FILE
+add_fileset_file acl_profiler_extmem.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_profiler_extmem.v TOP_LEVEL_FILE
 
 
 add_fileset SIM_VERILOG SIM_VERILOG "" ""
@@ -139,6 +141,7 @@ add_fileset_file acl_ll_ram_fifo.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/
 add_fileset_file acl_loop_limiter.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_loop_limiter.v TOP_LEVEL_FILE
 add_fileset_file acl_multistage_accumulator.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_multistage_accumulator.v TOP_LEVEL_FILE
 add_fileset_file acl_multistage_adder.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_multistage_adder.v TOP_LEVEL_FILE
+add_fileset_file acl_profiler.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_profiler.v TOP_LEVEL_FILE
 add_fileset_file acl_shift_register.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_shift_register.v TOP_LEVEL_FILE
 add_fileset_file acl_staging_reg.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_staging_reg.v TOP_LEVEL_FILE
 add_fileset_file acl_stall_free_sink.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_stall_free_sink.v TOP_LEVEL_FILE
@@ -178,3 +181,4 @@ add_fileset_file acl_atomics_nostall.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKRO
 add_fileset_file acl_atomics_arb_stall.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_atomics_arb_stall.v TOP_LEVEL_FILE
 add_fileset_file acl_address_to_bankaddress.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_address_to_bankaddress.v TOP_LEVEL_FILE
 add_fileset_file acl_ic_mem_router.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_ic_mem_router.v TOP_LEVEL_FILE
+add_fileset_file acl_profiler_extmem.v SYSTEM_VERILOG PATH $::env(ALTERAOCLSDKROOT)/ip/acl_profiler_extmem.v TOP_LEVEL_FILE

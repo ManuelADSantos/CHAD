@@ -11,7 +11,7 @@ set_global_assignment -entity "system" -library "system" -name IP_COMPONENT_DISP
 set_global_assignment -entity "system" -library "system" -name IP_COMPONENT_REPORT_HIERARCHY "On"
 set_global_assignment -entity "system" -library "system" -name IP_COMPONENT_INTERNAL "Off"
 set_global_assignment -entity "system" -library "system" -name IP_COMPONENT_VERSION "MS4w"
-set_global_assignment -entity "system" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTYwODE5OTc1OQ==::QXV0byBHRU5FUkFUSU9OX0lE"
+set_global_assignment -entity "system" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTcwMjU1Mjk2OA==::QXV0byBHRU5FUkFUSU9OX0lE"
 set_global_assignment -entity "system" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0VfRkFNSUxZ::Q3ljbG9uZSBW::QXV0byBERVZJQ0VfRkFNSUxZ"
 set_global_assignment -entity "system" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0U=::NUNTRU1BNUYzMUM2::QXV0byBERVZJQ0U="
 set_global_assignment -entity "system" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0VfU1BFRURHUkFERQ==::Ng==::QXV0byBERVZJQ0VfU1BFRURHUkFERQ=="
@@ -227,7 +227,7 @@ set_global_assignment -entity "system_acl_iface" -library "system" -name IP_COMP
 set_global_assignment -entity "system_acl_iface" -library "system" -name IP_COMPONENT_REPORT_HIERARCHY "On"
 set_global_assignment -entity "system_acl_iface" -library "system" -name IP_COMPONENT_INTERNAL "Off"
 set_global_assignment -entity "system_acl_iface" -library "system" -name IP_COMPONENT_VERSION "MS4w"
-set_global_assignment -entity "system_acl_iface" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTYwODE5OTc1OQ==::QXV0byBHRU5FUkFUSU9OX0lE"
+set_global_assignment -entity "system_acl_iface" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTcwMjU1Mjk2OA==::QXV0byBHRU5FUkFUSU9OX0lE"
 set_global_assignment -entity "system_acl_iface" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19VTklRVUVfSUQ=::c3lzdGVtX2FjbF9pZmFjZQ==::QXV0byBVTklRVUVfSUQ="
 set_global_assignment -entity "system_acl_iface" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0VfRkFNSUxZ::Q3ljbG9uZSBW::QXV0byBERVZJQ0VfRkFNSUxZ"
 set_global_assignment -entity "system_acl_iface" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0U=::NUNTRU1BNUYzMUM2::QXV0byBERVZJQ0U="
@@ -1139,7 +1139,7 @@ set_global_assignment -entity "system_acl_iface_acl_kernel_interface" -library "
 set_global_assignment -entity "system_acl_iface_acl_kernel_interface" -library "system" -name IP_COMPONENT_INTERNAL "Off"
 set_global_assignment -entity "system_acl_iface_acl_kernel_interface" -library "system" -name IP_COMPONENT_VERSION "MS4w"
 set_global_assignment -entity "system_acl_iface_acl_kernel_interface" -library "system" -name IP_COMPONENT_DESCRIPTION "QUNMIEtlcm5lbCBJbnRlcmZhY2U="
-set_global_assignment -entity "system_acl_iface_acl_kernel_interface" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTYwODE5OTc1OQ==::QXV0byBHRU5FUkFUSU9OX0lE"
+set_global_assignment -entity "system_acl_iface_acl_kernel_interface" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTcwMjU1Mjk2OA==::QXV0byBHRU5FUkFUSU9OX0lE"
 set_global_assignment -entity "system_acl_iface_acl_kernel_interface" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19VTklRVUVfSUQ=::c3lzdGVtX2FjbF9pZmFjZV9hY2xfa2VybmVsX2ludGVyZmFjZQ==::QXV0byBVTklRVUVfSUQ="
 set_global_assignment -entity "system_acl_iface_acl_kernel_interface" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0VfRkFNSUxZ::Q3ljbG9uZSBW::QXV0byBERVZJQ0VfRkFNSUxZ"
 set_global_assignment -entity "system_acl_iface_acl_kernel_interface" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0U=::NUNTRU1BNUYzMUM2::QXV0byBERVZJQ0U="
@@ -7398,7 +7398,7 @@ set_global_assignment -entity "system_acl_iface_acl_kernel_clk" -library "system
 set_global_assignment -entity "system_acl_iface_acl_kernel_clk" -library "system" -name IP_COMPONENT_INTERNAL "Off"
 set_global_assignment -entity "system_acl_iface_acl_kernel_clk" -library "system" -name IP_COMPONENT_VERSION "MS4w"
 set_global_assignment -entity "system_acl_iface_acl_kernel_clk" -library "system" -name IP_COMPONENT_DESCRIPTION "R2VuZXJhdGVzIHRoZSBrZXJuZWwgY2xvY2tzIGZvciBBQ0w="
-set_global_assignment -entity "system_acl_iface_acl_kernel_clk" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTYwODE5OTc1OQ==::QXV0byBHRU5FUkFUSU9OX0lE"
+set_global_assignment -entity "system_acl_iface_acl_kernel_clk" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19HRU5FUkFUSU9OX0lE::MTcwMjU1Mjk2OA==::QXV0byBHRU5FUkFUSU9OX0lE"
 set_global_assignment -entity "system_acl_iface_acl_kernel_clk" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19VTklRVUVfSUQ=::c3lzdGVtX2FjbF9pZmFjZV9hY2xfa2VybmVsX2Nsaw==::QXV0byBVTklRVUVfSUQ="
 set_global_assignment -entity "system_acl_iface_acl_kernel_clk" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0VfRkFNSUxZ::Q3ljbG9uZSBW::QXV0byBERVZJQ0VfRkFNSUxZ"
 set_global_assignment -entity "system_acl_iface_acl_kernel_clk" -library "system" -name IP_COMPONENT_PARAMETER "QVVUT19ERVZJQ0U=::NUNTRU1BNUYzMUM2::QXV0byBERVZJQ0U="
@@ -8108,6 +8108,7 @@ set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::q
 set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/acl_loop_limiter.v"]
 set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/acl_multistage_accumulator.v"]
 set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/acl_multistage_adder.v"]
+set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/acl_profiler.v"]
 set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/acl_shift_register.v"]
 set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/acl_staging_reg.v"]
 set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/acl_stall_free_sink.v"]
@@ -8147,6 +8148,7 @@ set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::q
 set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/acl_atomics_arb_stall.v"]
 set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/acl_address_to_bankaddress.v"]
 set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/acl_ic_mem_router.v"]
+set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/acl_profiler_extmem.v"]
 set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/cra_ring_root.sv"]
 set_global_assignment -library "system" -name SYSTEMVERILOG_FILE [file join $::quartus(qip_path) "submodules/cra_ring_node.sv"]
 set_global_assignment -library "system" -name VERILOG_FILE [file join $::quartus(qip_path) "submodules/system_acl_iface.v"]

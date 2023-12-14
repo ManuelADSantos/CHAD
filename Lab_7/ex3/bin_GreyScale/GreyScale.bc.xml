@@ -58,9 +58,9 @@
 			<INTERFACE port="local_bb1_st_c0_exe1_inst0" type="master" width="256" burstwidth="5" pipelined="true" addr_space="__global" aspace_id="1" optype="write" criticality="1024" buffer_location="" group_id="0" />
 		</DATA>
 		<KERNEL_ARGS>
-			<ARGUMENT name="grayImage" opencl_access_type="ACL_ARG_ADDR_GLOBAL" opencl_type_category="ACL_ARG_MEM_OBJ" size="8" >
-		</ARGUMENT>
 			<ARGUMENT name="rgbImage" opencl_access_type="ACL_ARG_ADDR_GLOBAL" opencl_type_category="ACL_ARG_MEM_OBJ" size="8" >
+		</ARGUMENT>
+			<ARGUMENT name="grayImage" opencl_access_type="ACL_ARG_ADDR_GLOBAL" opencl_type_category="ACL_ARG_MEM_OBJ" size="8" >
 		</ARGUMENT>
 		</KERNEL_ARGS>
 		<PRINTF_FORMAT_STRINGS>

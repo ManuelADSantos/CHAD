@@ -249,6 +249,13 @@ module vectorAdd_basic_block_1
 		output [255:0] 		avm_local_bb1_ld__writedata,
 		output [31:0] 		avm_local_bb1_ld__byteenable,
 		output [4:0] 		avm_local_bb1_ld__burstcount,
+		output 		profile_lsu_local_bb1_ld__profile_bw_cntl,
+		output [31:0] 		profile_lsu_local_bb1_ld__profile_bw_incr,
+		output 		profile_lsu_local_bb1_ld__profile_total_ivalid_cntl,
+		output 		profile_lsu_local_bb1_ld__profile_avm_readwrite_count_cntl,
+		output 		profile_lsu_local_bb1_ld__profile_avm_burstcount_total_cntl,
+		output [31:0] 		profile_lsu_local_bb1_ld__profile_avm_burstcount_total_incr,
+		output 		profile_lsu_local_bb1_ld__profile_avm_stall_cntl,
 		output 		local_bb1_ld__active,
 		input 		clock2x,
 		input [255:0] 		avm_local_bb1_ld__u0_readdata,
@@ -261,6 +268,13 @@ module vectorAdd_basic_block_1
 		output [255:0] 		avm_local_bb1_ld__u0_writedata,
 		output [31:0] 		avm_local_bb1_ld__u0_byteenable,
 		output [4:0] 		avm_local_bb1_ld__u0_burstcount,
+		output 		profile_lsu_local_bb1_ld__u0_profile_bw_cntl,
+		output [31:0] 		profile_lsu_local_bb1_ld__u0_profile_bw_incr,
+		output 		profile_lsu_local_bb1_ld__u0_profile_total_ivalid_cntl,
+		output 		profile_lsu_local_bb1_ld__u0_profile_avm_readwrite_count_cntl,
+		output 		profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_cntl,
+		output [31:0] 		profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_incr,
+		output 		profile_lsu_local_bb1_ld__u0_profile_avm_stall_cntl,
 		output 		local_bb1_ld__u0_active,
 		input [255:0] 		avm_local_bb1_st_c0_exe1_readdata,
 		input 		avm_local_bb1_st_c0_exe1_readdatavalid,
@@ -272,6 +286,13 @@ module vectorAdd_basic_block_1
 		output [255:0] 		avm_local_bb1_st_c0_exe1_writedata,
 		output [31:0] 		avm_local_bb1_st_c0_exe1_byteenable,
 		output [4:0] 		avm_local_bb1_st_c0_exe1_burstcount,
+		output 		profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl,
+		output [31:0] 		profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr,
+		output 		profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl,
+		output 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl,
+		output 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl,
+		output [31:0] 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr,
+		output 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_stall_cntl,
 		output 		local_bb1_st_c0_exe1_active
 	);
 
@@ -685,18 +706,18 @@ lsu_top lsu_local_bb1_ld_ (
 	.avm_byteenable(avm_local_bb1_ld__byteenable),
 	.avm_waitrequest(avm_local_bb1_ld__waitrequest),
 	.avm_readdatavalid(avm_local_bb1_ld__readdatavalid),
-	.profile_bw(),
-	.profile_bw_incr(),
-	.profile_total_ivalid(),
+	.profile_bw(profile_lsu_local_bb1_ld__profile_bw_cntl),
+	.profile_bw_incr(profile_lsu_local_bb1_ld__profile_bw_incr),
+	.profile_total_ivalid(profile_lsu_local_bb1_ld__profile_total_ivalid_cntl),
 	.profile_total_req(),
 	.profile_i_stall_count(),
 	.profile_o_stall_count(),
-	.profile_avm_readwrite_count(),
-	.profile_avm_burstcount_total(),
-	.profile_avm_burstcount_total_incr(),
+	.profile_avm_readwrite_count(profile_lsu_local_bb1_ld__profile_avm_readwrite_count_cntl),
+	.profile_avm_burstcount_total(profile_lsu_local_bb1_ld__profile_avm_burstcount_total_cntl),
+	.profile_avm_burstcount_total_incr(profile_lsu_local_bb1_ld__profile_avm_burstcount_total_incr),
 	.profile_req_cache_hit_count(),
 	.profile_extra_unaligned_reqs(),
-	.profile_avm_stall()
+	.profile_avm_stall(profile_lsu_local_bb1_ld__profile_avm_stall_cntl)
 );
 
 defparam lsu_local_bb1_ld_.AWIDTH = 30;
@@ -722,6 +743,8 @@ defparam lsu_local_bb1_ld_.USECACHING = 0;
 defparam lsu_local_bb1_ld_.USEOUTPUTFIFO = 1;
 defparam lsu_local_bb1_ld_.FORCE_NOP_SUPPORT = 0;
 defparam lsu_local_bb1_ld_.HIGH_FMAX = 1;
+defparam lsu_local_bb1_ld_.ACL_PROFILE = 1;
+defparam lsu_local_bb1_ld_.ACL_PROFILE_INCREMENT_WIDTH = 32;
 defparam lsu_local_bb1_ld_.ADDRSPACE = 1;
 defparam lsu_local_bb1_ld_.STYLE = "STREAMING";
 
@@ -800,18 +823,18 @@ lsu_top lsu_local_bb1_ld__u0 (
 	.avm_byteenable(avm_local_bb1_ld__u0_byteenable),
 	.avm_waitrequest(avm_local_bb1_ld__u0_waitrequest),
 	.avm_readdatavalid(avm_local_bb1_ld__u0_readdatavalid),
-	.profile_bw(),
-	.profile_bw_incr(),
-	.profile_total_ivalid(),
+	.profile_bw(profile_lsu_local_bb1_ld__u0_profile_bw_cntl),
+	.profile_bw_incr(profile_lsu_local_bb1_ld__u0_profile_bw_incr),
+	.profile_total_ivalid(profile_lsu_local_bb1_ld__u0_profile_total_ivalid_cntl),
 	.profile_total_req(),
 	.profile_i_stall_count(),
 	.profile_o_stall_count(),
-	.profile_avm_readwrite_count(),
-	.profile_avm_burstcount_total(),
-	.profile_avm_burstcount_total_incr(),
+	.profile_avm_readwrite_count(profile_lsu_local_bb1_ld__u0_profile_avm_readwrite_count_cntl),
+	.profile_avm_burstcount_total(profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_cntl),
+	.profile_avm_burstcount_total_incr(profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_incr),
 	.profile_req_cache_hit_count(),
 	.profile_extra_unaligned_reqs(),
-	.profile_avm_stall()
+	.profile_avm_stall(profile_lsu_local_bb1_ld__u0_profile_avm_stall_cntl)
 );
 
 defparam lsu_local_bb1_ld__u0.AWIDTH = 30;
@@ -837,6 +860,8 @@ defparam lsu_local_bb1_ld__u0.USECACHING = 0;
 defparam lsu_local_bb1_ld__u0.USEOUTPUTFIFO = 1;
 defparam lsu_local_bb1_ld__u0.FORCE_NOP_SUPPORT = 0;
 defparam lsu_local_bb1_ld__u0.HIGH_FMAX = 1;
+defparam lsu_local_bb1_ld__u0.ACL_PROFILE = 1;
+defparam lsu_local_bb1_ld__u0.ACL_PROFILE_INCREMENT_WIDTH = 32;
 defparam lsu_local_bb1_ld__u0.ADDRSPACE = 1;
 defparam lsu_local_bb1_ld__u0.STYLE = "STREAMING";
 
@@ -4263,18 +4288,18 @@ lsu_top lsu_local_bb1_st_c0_exe1 (
 	.avm_byteenable(avm_local_bb1_st_c0_exe1_byteenable),
 	.avm_waitrequest(avm_local_bb1_st_c0_exe1_waitrequest),
 	.avm_readdatavalid(avm_local_bb1_st_c0_exe1_readdatavalid),
-	.profile_bw(),
-	.profile_bw_incr(),
-	.profile_total_ivalid(),
+	.profile_bw(profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl),
+	.profile_bw_incr(profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr),
+	.profile_total_ivalid(profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl),
 	.profile_total_req(),
 	.profile_i_stall_count(),
 	.profile_o_stall_count(),
-	.profile_avm_readwrite_count(),
-	.profile_avm_burstcount_total(),
-	.profile_avm_burstcount_total_incr(),
+	.profile_avm_readwrite_count(profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl),
+	.profile_avm_burstcount_total(profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl),
+	.profile_avm_burstcount_total_incr(profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr),
 	.profile_req_cache_hit_count(),
 	.profile_extra_unaligned_reqs(),
-	.profile_avm_stall()
+	.profile_avm_stall(profile_lsu_local_bb1_st_c0_exe1_profile_avm_stall_cntl)
 );
 
 defparam lsu_local_bb1_st_c0_exe1.AWIDTH = 30;
@@ -4300,6 +4325,8 @@ defparam lsu_local_bb1_st_c0_exe1.USECACHING = 0;
 defparam lsu_local_bb1_st_c0_exe1.USEOUTPUTFIFO = 1;
 defparam lsu_local_bb1_st_c0_exe1.FORCE_NOP_SUPPORT = 0;
 defparam lsu_local_bb1_st_c0_exe1.HIGH_FMAX = 1;
+defparam lsu_local_bb1_st_c0_exe1.ACL_PROFILE = 1;
+defparam lsu_local_bb1_st_c0_exe1.ACL_PROFILE_INCREMENT_WIDTH = 32;
 defparam lsu_local_bb1_st_c0_exe1.ADDRSPACE = 1;
 defparam lsu_local_bb1_st_c0_exe1.STYLE = "STREAMING";
 defparam lsu_local_bb1_st_c0_exe1.USE_BYTE_EN = 0;
@@ -4408,6 +4435,13 @@ module vectorAdd_function
 		output [255:0] 		avm_local_bb1_ld__writedata,
 		output [31:0] 		avm_local_bb1_ld__byteenable,
 		output [4:0] 		avm_local_bb1_ld__burstcount,
+		output 		profile_lsu_local_bb1_ld__profile_bw_cntl,
+		output [31:0] 		profile_lsu_local_bb1_ld__profile_bw_incr,
+		output 		profile_lsu_local_bb1_ld__profile_total_ivalid_cntl,
+		output 		profile_lsu_local_bb1_ld__profile_avm_readwrite_count_cntl,
+		output 		profile_lsu_local_bb1_ld__profile_avm_burstcount_total_cntl,
+		output [31:0] 		profile_lsu_local_bb1_ld__profile_avm_burstcount_total_incr,
+		output 		profile_lsu_local_bb1_ld__profile_avm_stall_cntl,
 		input [255:0] 		avm_local_bb1_ld__u0_readdata,
 		input 		avm_local_bb1_ld__u0_readdatavalid,
 		input 		avm_local_bb1_ld__u0_waitrequest,
@@ -4418,6 +4452,13 @@ module vectorAdd_function
 		output [255:0] 		avm_local_bb1_ld__u0_writedata,
 		output [31:0] 		avm_local_bb1_ld__u0_byteenable,
 		output [4:0] 		avm_local_bb1_ld__u0_burstcount,
+		output 		profile_lsu_local_bb1_ld__u0_profile_bw_cntl,
+		output [31:0] 		profile_lsu_local_bb1_ld__u0_profile_bw_incr,
+		output 		profile_lsu_local_bb1_ld__u0_profile_total_ivalid_cntl,
+		output 		profile_lsu_local_bb1_ld__u0_profile_avm_readwrite_count_cntl,
+		output 		profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_cntl,
+		output [31:0] 		profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_incr,
+		output 		profile_lsu_local_bb1_ld__u0_profile_avm_stall_cntl,
 		input [255:0] 		avm_local_bb1_st_c0_exe1_readdata,
 		input 		avm_local_bb1_st_c0_exe1_readdatavalid,
 		input 		avm_local_bb1_st_c0_exe1_waitrequest,
@@ -4428,12 +4469,20 @@ module vectorAdd_function
 		output [255:0] 		avm_local_bb1_st_c0_exe1_writedata,
 		output [31:0] 		avm_local_bb1_st_c0_exe1_byteenable,
 		output [4:0] 		avm_local_bb1_st_c0_exe1_burstcount,
+		output 		profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl,
+		output [31:0] 		profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr,
+		output 		profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl,
+		output 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl,
+		output 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl,
+		output [31:0] 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr,
+		output 		profile_lsu_local_bb1_st_c0_exe1_profile_avm_stall_cntl,
 		input 		start,
 		input 		clock2x,
 		input [63:0] 		input_x,
 		input [63:0] 		input_y,
 		input [63:0] 		input_z,
 		input [31:0] 		input_global_size_0,
+		output 		profile_clock,
 		output reg 		has_a_write_pending,
 		output reg 		has_a_lsu_active
 	);
@@ -4496,6 +4545,13 @@ vectorAdd_basic_block_1 vectorAdd_basic_block_1 (
 	.avm_local_bb1_ld__writedata(avm_local_bb1_ld__writedata),
 	.avm_local_bb1_ld__byteenable(avm_local_bb1_ld__byteenable),
 	.avm_local_bb1_ld__burstcount(avm_local_bb1_ld__burstcount),
+	.profile_lsu_local_bb1_ld__profile_bw_cntl(profile_lsu_local_bb1_ld__profile_bw_cntl),
+	.profile_lsu_local_bb1_ld__profile_bw_incr(profile_lsu_local_bb1_ld__profile_bw_incr),
+	.profile_lsu_local_bb1_ld__profile_total_ivalid_cntl(profile_lsu_local_bb1_ld__profile_total_ivalid_cntl),
+	.profile_lsu_local_bb1_ld__profile_avm_readwrite_count_cntl(profile_lsu_local_bb1_ld__profile_avm_readwrite_count_cntl),
+	.profile_lsu_local_bb1_ld__profile_avm_burstcount_total_cntl(profile_lsu_local_bb1_ld__profile_avm_burstcount_total_cntl),
+	.profile_lsu_local_bb1_ld__profile_avm_burstcount_total_incr(profile_lsu_local_bb1_ld__profile_avm_burstcount_total_incr),
+	.profile_lsu_local_bb1_ld__profile_avm_stall_cntl(profile_lsu_local_bb1_ld__profile_avm_stall_cntl),
 	.local_bb1_ld__active(bb_1_local_bb1_ld__active),
 	.clock2x(clock2x),
 	.avm_local_bb1_ld__u0_readdata(avm_local_bb1_ld__u0_readdata),
@@ -4508,6 +4564,13 @@ vectorAdd_basic_block_1 vectorAdd_basic_block_1 (
 	.avm_local_bb1_ld__u0_writedata(avm_local_bb1_ld__u0_writedata),
 	.avm_local_bb1_ld__u0_byteenable(avm_local_bb1_ld__u0_byteenable),
 	.avm_local_bb1_ld__u0_burstcount(avm_local_bb1_ld__u0_burstcount),
+	.profile_lsu_local_bb1_ld__u0_profile_bw_cntl(profile_lsu_local_bb1_ld__u0_profile_bw_cntl),
+	.profile_lsu_local_bb1_ld__u0_profile_bw_incr(profile_lsu_local_bb1_ld__u0_profile_bw_incr),
+	.profile_lsu_local_bb1_ld__u0_profile_total_ivalid_cntl(profile_lsu_local_bb1_ld__u0_profile_total_ivalid_cntl),
+	.profile_lsu_local_bb1_ld__u0_profile_avm_readwrite_count_cntl(profile_lsu_local_bb1_ld__u0_profile_avm_readwrite_count_cntl),
+	.profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_cntl(profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_cntl),
+	.profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_incr(profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_incr),
+	.profile_lsu_local_bb1_ld__u0_profile_avm_stall_cntl(profile_lsu_local_bb1_ld__u0_profile_avm_stall_cntl),
 	.local_bb1_ld__u0_active(bb_1_local_bb1_ld__u0_active),
 	.avm_local_bb1_st_c0_exe1_readdata(avm_local_bb1_st_c0_exe1_readdata),
 	.avm_local_bb1_st_c0_exe1_readdatavalid(avm_local_bb1_st_c0_exe1_readdatavalid),
@@ -4519,12 +4582,20 @@ vectorAdd_basic_block_1 vectorAdd_basic_block_1 (
 	.avm_local_bb1_st_c0_exe1_writedata(avm_local_bb1_st_c0_exe1_writedata),
 	.avm_local_bb1_st_c0_exe1_byteenable(avm_local_bb1_st_c0_exe1_byteenable),
 	.avm_local_bb1_st_c0_exe1_burstcount(avm_local_bb1_st_c0_exe1_burstcount),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr(profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr(profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_stall_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_avm_stall_cntl),
 	.local_bb1_st_c0_exe1_active(bb_1_local_bb1_st_c0_exe1_active)
 );
 
 
 assign valid_out = bb_1_valid_out;
 assign stall_out = bb_0_stall_out;
+assign profile_clock = 1'b1;
 assign writes_pending = bb_1_local_bb1_st_c0_exe1_active;
 assign lsus_active[0] = bb_1_local_bb1_ld__active;
 assign lsus_active[1] = bb_1_local_bb1_ld__u0_active;
@@ -4558,6 +4629,10 @@ module vectorAdd_function_wrapper
 		input 		resetn,
 		input 		clock2x,
 		input 		local_router_hang,
+		input 		profile_extmem_vectorAdd_function_bank0_port0_read_data_inc_en,
+		input 		profile_extmem_vectorAdd_function_bank0_port0_read_burst_count_en,
+		input 		profile_extmem_vectorAdd_function_bank0_port0_write_data_inc_en,
+		input 		profile_extmem_vectorAdd_function_bank0_port0_write_burst_count_en,
 		input 		avs_cra_read,
 		input 		avs_cra_write,
 		input [3:0] 		avs_cra_address,
@@ -4648,6 +4723,32 @@ begin
 end
 
 
+// Profiling IP for various signals.
+ reg profile_reset_reg_NO_SHIFT_REG;
+ reg [63:0] profile_cycle_counter_NO_SHIFT_REG;
+ reg profile_cycle_count_in_range_reg_NO_SHIFT_REG;
+wire [63:0] profile_data_wire;
+wire profile_shift_wire;
+wire profile_reset_n_wire;
+wire profile_enable_wire;
+wire [19:0] profile_increment_cntl;
+wire [639:0] profile_increment_val;
+
+acl_profiler profiler_inst (
+	.clock(clock),
+	.profile_shift(profile_shift_wire),
+	.incr_cntl(profile_increment_cntl),
+	.incr_val(profile_increment_val),
+	.daisy_out(profile_data_wire),
+	.resetn(profile_reset_n_wire),
+	.enable(profile_enable_wire)
+);
+
+defparam profiler_inst.COUNTER_WIDTH = 64;
+defparam profiler_inst.INCREMENT_WIDTH = 32;
+defparam profiler_inst.NUM_COUNTERS = 20;
+defparam profiler_inst.DAISY_WIDTH = 64;
+
 
 // Work group dispatcher is responsible for issuing work-groups to id iterator(s)
 acl_work_group_dispatcher group_dispatcher (
@@ -4685,6 +4786,9 @@ assign bitenable[47:40] = (avs_cra_byteenable[5] ? 8'hFF : 8'h0);
 assign bitenable[55:48] = (avs_cra_byteenable[6] ? 8'hFF : 8'h0);
 assign bitenable[63:56] = (avs_cra_byteenable[7] ? 8'hFF : 8'h0);
 assign cra_irq = (status_NO_SHIFT_REG[1] | status_NO_SHIFT_REG[3]);
+assign profile_enable_wire = (profile_cycle_count_in_range_reg_NO_SHIFT_REG & (started_NO_SHIFT_REG & profile_ctrl_NO_SHIFT_REG[2]));
+assign profile_reset_n_wire = (resetn & ~(profile_reset_reg_NO_SHIFT_REG));
+assign profile_shift_wire = profile_ctrl_NO_SHIFT_REG[0];
 
 always @(posedge clock or negedge resetn)
 begin
@@ -4711,6 +4815,7 @@ begin
 		global_offset_NO_SHIFT_REG[0] <= 32'h0;
 		global_offset_NO_SHIFT_REG[1] <= 32'h0;
 		global_offset_NO_SHIFT_REG[2] <= 32'h0;
+		profile_reset_reg_NO_SHIFT_REG <= 1'b0;
 	end
 	else
 	begin
@@ -4808,6 +4913,22 @@ begin
 		end
 		else
 		begin
+			if (profile_ctrl_NO_SHIFT_REG[1])
+			begin
+				if (profile_reset_reg_NO_SHIFT_REG)
+				begin
+					profile_ctrl_NO_SHIFT_REG[1] <= 1'b0;
+				end
+				else
+				begin
+					profile_reset_reg_NO_SHIFT_REG <= 1'b1;
+				end
+			end
+			else
+			begin
+				profile_reset_reg_NO_SHIFT_REG <= 1'b0;
+			end
+			profile_ctrl_NO_SHIFT_REG[0] <= 1'b0;
 			if (status_NO_SHIFT_REG[0])
 			begin
 				start_NO_SHIFT_REG <= 1'b1;
@@ -4857,22 +4978,22 @@ begin
 			4'h1:
 			begin
 				cra_readdata_st1_NO_SHIFT_REG[31:0] <= 'x;
-				cra_readdata_st1_NO_SHIFT_REG[63:32] <= 32'h0;
+				cra_readdata_st1_NO_SHIFT_REG[63:32] <= profile_ctrl_NO_SHIFT_REG;
 			end
 
 			4'h2:
 			begin
-				cra_readdata_st1_NO_SHIFT_REG[63:0] <= 64'h0;
+				cra_readdata_st1_NO_SHIFT_REG[63:0] <= profile_data_NO_SHIFT_REG;
 			end
 
 			4'h3:
 			begin
-				cra_readdata_st1_NO_SHIFT_REG[63:0] <= 64'h0;
+				cra_readdata_st1_NO_SHIFT_REG[63:0] <= profile_start_cycle_NO_SHIFT_REG;
 			end
 
 			4'h4:
 			begin
-				cra_readdata_st1_NO_SHIFT_REG[63:0] <= 64'h0;
+				cra_readdata_st1_NO_SHIFT_REG[63:0] <= profile_stop_cycle_NO_SHIFT_REG;
 			end
 
 			default:
@@ -4906,6 +5027,52 @@ begin
 			end
 
 		endcase
+	end
+end
+
+always @(posedge clock or negedge resetn)
+begin
+	if (~(resetn))
+	begin
+		profile_data_NO_SHIFT_REG <= 64'h0;
+	end
+	else
+	begin
+		if (profile_shift_wire)
+		begin
+			profile_data_NO_SHIFT_REG <= profile_data_wire;
+		end
+	end
+end
+
+always @(posedge clock or negedge resetn)
+begin
+	if (~(resetn))
+	begin
+		profile_cycle_counter_NO_SHIFT_REG <= 64'h0;
+	end
+	else
+	begin
+		if (started_NO_SHIFT_REG)
+		begin
+			profile_cycle_counter_NO_SHIFT_REG <= (profile_cycle_counter_NO_SHIFT_REG + 64'h1);
+		end
+		else
+		begin
+			profile_cycle_counter_NO_SHIFT_REG <= 64'h0;
+		end
+	end
+end
+
+always @(posedge clock or negedge resetn)
+begin
+	if (~(resetn))
+	begin
+		profile_cycle_count_in_range_reg_NO_SHIFT_REG <= 1'b0;
+	end
+	else
+	begin
+		profile_cycle_count_in_range_reg_NO_SHIFT_REG <= ((profile_cycle_counter_NO_SHIFT_REG >= profile_start_cycle_NO_SHIFT_REG) & (profile_cycle_counter_NO_SHIFT_REG < profile_stop_cycle_NO_SHIFT_REG));
 	end
 end
 
@@ -4956,6 +5123,29 @@ acl_id_iterator id_iter_inst0 (
 
 
 // This section instantiates a kernel function block
+wire profile_lsu_local_bb1_ld__profile_bw_cntl_inst0_wire_0;
+wire [31:0] profile_lsu_local_bb1_ld__profile_bw_incr_inst0_wire_0;
+wire profile_lsu_local_bb1_ld__profile_total_ivalid_cntl_inst0_wire_0;
+wire profile_lsu_local_bb1_ld__profile_avm_readwrite_count_cntl_inst0_wire_0;
+wire profile_lsu_local_bb1_ld__profile_avm_burstcount_total_cntl_inst0_wire_0;
+wire [31:0] profile_lsu_local_bb1_ld__profile_avm_burstcount_total_incr_inst0_wire_0;
+wire profile_lsu_local_bb1_ld__profile_avm_stall_cntl_inst0_wire_0;
+wire profile_lsu_local_bb1_ld__u0_profile_bw_cntl_inst0_wire_0;
+wire [31:0] profile_lsu_local_bb1_ld__u0_profile_bw_incr_inst0_wire_0;
+wire profile_lsu_local_bb1_ld__u0_profile_total_ivalid_cntl_inst0_wire_0;
+wire profile_lsu_local_bb1_ld__u0_profile_avm_readwrite_count_cntl_inst0_wire_0;
+wire profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_cntl_inst0_wire_0;
+wire [31:0] profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_incr_inst0_wire_0;
+wire profile_lsu_local_bb1_ld__u0_profile_avm_stall_cntl_inst0_wire_0;
+wire profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl_inst0_wire_0;
+wire [31:0] profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr_inst0_wire_0;
+wire profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl_inst0_wire_0;
+wire profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl_inst0_wire_0;
+wire profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl_inst0_wire_0;
+wire [31:0] profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr_inst0_wire_0;
+wire profile_lsu_local_bb1_st_c0_exe1_profile_avm_stall_cntl_inst0_wire_0;
+wire profile_clock_inst0_wire_0;
+
 vectorAdd_function vectorAdd_function_inst0 (
 	.clock(clock),
 	.resetn(resetn),
@@ -4975,6 +5165,13 @@ vectorAdd_function vectorAdd_function_inst0 (
 	.avm_local_bb1_ld__writedata(avm_local_bb1_ld__inst0_writedata),
 	.avm_local_bb1_ld__byteenable(avm_local_bb1_ld__inst0_byteenable),
 	.avm_local_bb1_ld__burstcount(avm_local_bb1_ld__inst0_burstcount),
+	.profile_lsu_local_bb1_ld__profile_bw_cntl(profile_lsu_local_bb1_ld__profile_bw_cntl_inst0_wire_0),
+	.profile_lsu_local_bb1_ld__profile_bw_incr(profile_lsu_local_bb1_ld__profile_bw_incr_inst0_wire_0),
+	.profile_lsu_local_bb1_ld__profile_total_ivalid_cntl(profile_lsu_local_bb1_ld__profile_total_ivalid_cntl_inst0_wire_0),
+	.profile_lsu_local_bb1_ld__profile_avm_readwrite_count_cntl(profile_lsu_local_bb1_ld__profile_avm_readwrite_count_cntl_inst0_wire_0),
+	.profile_lsu_local_bb1_ld__profile_avm_burstcount_total_cntl(profile_lsu_local_bb1_ld__profile_avm_burstcount_total_cntl_inst0_wire_0),
+	.profile_lsu_local_bb1_ld__profile_avm_burstcount_total_incr(profile_lsu_local_bb1_ld__profile_avm_burstcount_total_incr_inst0_wire_0),
+	.profile_lsu_local_bb1_ld__profile_avm_stall_cntl(profile_lsu_local_bb1_ld__profile_avm_stall_cntl_inst0_wire_0),
 	.avm_local_bb1_ld__u0_readdata(avm_local_bb1_ld__u0_inst0_readdata),
 	.avm_local_bb1_ld__u0_readdatavalid(avm_local_bb1_ld__u0_inst0_readdatavalid),
 	.avm_local_bb1_ld__u0_waitrequest(avm_local_bb1_ld__u0_inst0_waitrequest),
@@ -4985,6 +5182,13 @@ vectorAdd_function vectorAdd_function_inst0 (
 	.avm_local_bb1_ld__u0_writedata(avm_local_bb1_ld__u0_inst0_writedata),
 	.avm_local_bb1_ld__u0_byteenable(avm_local_bb1_ld__u0_inst0_byteenable),
 	.avm_local_bb1_ld__u0_burstcount(avm_local_bb1_ld__u0_inst0_burstcount),
+	.profile_lsu_local_bb1_ld__u0_profile_bw_cntl(profile_lsu_local_bb1_ld__u0_profile_bw_cntl_inst0_wire_0),
+	.profile_lsu_local_bb1_ld__u0_profile_bw_incr(profile_lsu_local_bb1_ld__u0_profile_bw_incr_inst0_wire_0),
+	.profile_lsu_local_bb1_ld__u0_profile_total_ivalid_cntl(profile_lsu_local_bb1_ld__u0_profile_total_ivalid_cntl_inst0_wire_0),
+	.profile_lsu_local_bb1_ld__u0_profile_avm_readwrite_count_cntl(profile_lsu_local_bb1_ld__u0_profile_avm_readwrite_count_cntl_inst0_wire_0),
+	.profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_cntl(profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_cntl_inst0_wire_0),
+	.profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_incr(profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_incr_inst0_wire_0),
+	.profile_lsu_local_bb1_ld__u0_profile_avm_stall_cntl(profile_lsu_local_bb1_ld__u0_profile_avm_stall_cntl_inst0_wire_0),
 	.avm_local_bb1_st_c0_exe1_readdata(avm_local_bb1_st_c0_exe1_inst0_readdata),
 	.avm_local_bb1_st_c0_exe1_readdatavalid(avm_local_bb1_st_c0_exe1_inst0_readdatavalid),
 	.avm_local_bb1_st_c0_exe1_waitrequest(avm_local_bb1_st_c0_exe1_inst0_waitrequest),
@@ -4995,17 +5199,65 @@ vectorAdd_function vectorAdd_function_inst0 (
 	.avm_local_bb1_st_c0_exe1_writedata(avm_local_bb1_st_c0_exe1_inst0_writedata),
 	.avm_local_bb1_st_c0_exe1_byteenable(avm_local_bb1_st_c0_exe1_inst0_byteenable),
 	.avm_local_bb1_st_c0_exe1_burstcount(avm_local_bb1_st_c0_exe1_inst0_burstcount),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl_inst0_wire_0),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr(profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr_inst0_wire_0),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl_inst0_wire_0),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl_inst0_wire_0),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl_inst0_wire_0),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr(profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr_inst0_wire_0),
+	.profile_lsu_local_bb1_st_c0_exe1_profile_avm_stall_cntl(profile_lsu_local_bb1_st_c0_exe1_profile_avm_stall_cntl_inst0_wire_0),
 	.start(start_out),
 	.clock2x(clock2x),
 	.input_x(kernel_arguments_NO_SHIFT_REG[63:0]),
 	.input_y(kernel_arguments_NO_SHIFT_REG[127:64]),
 	.input_z(kernel_arguments_NO_SHIFT_REG[191:128]),
 	.input_global_size_0(global_size_NO_SHIFT_REG[0]),
+	.profile_clock(profile_clock_inst0_wire_0),
 	.has_a_write_pending(has_a_write_pending),
 	.has_a_lsu_active(has_a_lsu_active)
 );
 
 
+assign profile_increment_cntl[0] = profile_lsu_local_bb1_ld__profile_bw_cntl_inst0_wire_0;
+assign profile_increment_val[31:0] = profile_lsu_local_bb1_ld__profile_bw_incr_inst0_wire_0;
+assign profile_increment_cntl[1] = profile_lsu_local_bb1_ld__profile_total_ivalid_cntl_inst0_wire_0;
+assign profile_increment_val[63:32] = 32'h1;
+assign profile_increment_cntl[2] = profile_lsu_local_bb1_ld__profile_avm_readwrite_count_cntl_inst0_wire_0;
+assign profile_increment_val[95:64] = 32'h1;
+assign profile_increment_cntl[3] = profile_lsu_local_bb1_ld__profile_avm_burstcount_total_cntl_inst0_wire_0;
+assign profile_increment_val[127:96] = profile_lsu_local_bb1_ld__profile_avm_burstcount_total_incr_inst0_wire_0;
+assign profile_increment_cntl[4] = profile_lsu_local_bb1_ld__profile_avm_stall_cntl_inst0_wire_0;
+assign profile_increment_val[159:128] = 32'h1;
+assign profile_increment_cntl[5] = profile_lsu_local_bb1_ld__u0_profile_bw_cntl_inst0_wire_0;
+assign profile_increment_val[191:160] = profile_lsu_local_bb1_ld__u0_profile_bw_incr_inst0_wire_0;
+assign profile_increment_cntl[6] = profile_lsu_local_bb1_ld__u0_profile_total_ivalid_cntl_inst0_wire_0;
+assign profile_increment_val[223:192] = 32'h1;
+assign profile_increment_cntl[7] = profile_lsu_local_bb1_ld__u0_profile_avm_readwrite_count_cntl_inst0_wire_0;
+assign profile_increment_val[255:224] = 32'h1;
+assign profile_increment_cntl[8] = profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_cntl_inst0_wire_0;
+assign profile_increment_val[287:256] = profile_lsu_local_bb1_ld__u0_profile_avm_burstcount_total_incr_inst0_wire_0;
+assign profile_increment_cntl[9] = profile_lsu_local_bb1_ld__u0_profile_avm_stall_cntl_inst0_wire_0;
+assign profile_increment_val[319:288] = 32'h1;
+assign profile_increment_cntl[10] = profile_lsu_local_bb1_st_c0_exe1_profile_bw_cntl_inst0_wire_0;
+assign profile_increment_val[351:320] = profile_lsu_local_bb1_st_c0_exe1_profile_bw_incr_inst0_wire_0;
+assign profile_increment_cntl[11] = profile_lsu_local_bb1_st_c0_exe1_profile_total_ivalid_cntl_inst0_wire_0;
+assign profile_increment_val[383:352] = 32'h1;
+assign profile_increment_cntl[12] = profile_lsu_local_bb1_st_c0_exe1_profile_avm_readwrite_count_cntl_inst0_wire_0;
+assign profile_increment_val[415:384] = 32'h1;
+assign profile_increment_cntl[13] = profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_cntl_inst0_wire_0;
+assign profile_increment_val[447:416] = profile_lsu_local_bb1_st_c0_exe1_profile_avm_burstcount_total_incr_inst0_wire_0;
+assign profile_increment_cntl[14] = profile_lsu_local_bb1_st_c0_exe1_profile_avm_stall_cntl_inst0_wire_0;
+assign profile_increment_val[479:448] = 32'h1;
+assign profile_increment_cntl[15] = profile_clock_inst0_wire_0;
+assign profile_increment_val[511:480] = 32'h1;
+assign profile_increment_cntl[16] = profile_extmem_vectorAdd_function_bank0_port0_read_data_inc_en;
+assign profile_increment_val[543:512] = 32'h1;
+assign profile_increment_cntl[17] = profile_extmem_vectorAdd_function_bank0_port0_read_burst_count_en;
+assign profile_increment_val[575:544] = 32'h1;
+assign profile_increment_cntl[18] = profile_extmem_vectorAdd_function_bank0_port0_write_data_inc_en;
+assign profile_increment_val[607:576] = 32'h1;
+assign profile_increment_cntl[19] = profile_extmem_vectorAdd_function_bank0_port0_write_burst_count_en;
+assign profile_increment_val[639:608] = 32'h1;
 
 endmodule
 

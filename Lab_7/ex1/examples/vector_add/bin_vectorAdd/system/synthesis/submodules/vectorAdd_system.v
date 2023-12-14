@@ -39,6 +39,10 @@ module vectorAdd_system
    logic [255:0] gmem0_global_avm_readdata [3];
    logic gmem0_global_avm_readdatavalid [3];
    logic gmem0_global_avm_writeack [3];
+   logic profile_extmem_vectorAdd_function_bank0_port0_top_read_data_inc_en;
+   logic profile_extmem_vectorAdd_function_bank0_port0_top_write_data_inc_en;
+   logic profile_extmem_vectorAdd_function_bank0_port0_top_read_burst_count_en;
+   logic profile_extmem_vectorAdd_function_bank0_port0_top_write_burst_count_en;
 
    // INST vectorAdd of vectorAdd_top_wrapper
    vectorAdd_top_wrapper vectorAdd
@@ -87,7 +91,11 @@ module vectorAdd_system
       .avm_local_bb1_st_c0_exe1_inst0_waitrequest(gmem0_global_avm_waitrequest[2]),
       .avm_local_bb1_st_c0_exe1_inst0_readdata(gmem0_global_avm_readdata[2]),
       .avm_local_bb1_st_c0_exe1_inst0_readdatavalid(gmem0_global_avm_readdatavalid[2]),
-      .avm_local_bb1_st_c0_exe1_inst0_writeack(gmem0_global_avm_writeack[2])
+      .avm_local_bb1_st_c0_exe1_inst0_writeack(gmem0_global_avm_writeack[2]),
+      .profile_extmem_vectorAdd_function_bank0_port0_wrap_read_data_inc_en(profile_extmem_vectorAdd_function_bank0_port0_top_read_data_inc_en),
+      .profile_extmem_vectorAdd_function_bank0_port0_wrap_write_data_inc_en(profile_extmem_vectorAdd_function_bank0_port0_top_write_data_inc_en),
+      .profile_extmem_vectorAdd_function_bank0_port0_wrap_read_burst_count_en(profile_extmem_vectorAdd_function_bank0_port0_top_read_burst_count_en),
+      .profile_extmem_vectorAdd_function_bank0_port0_wrap_write_burst_count_en(profile_extmem_vectorAdd_function_bank0_port0_top_write_burst_count_en)
    );
 
    assign kernel_irq = |kernel_irqs;
@@ -486,6 +494,30 @@ module vectorAdd_system
    end
    endgenerate
 
+   // INST mem_profiler__bank0_port0_kernel0 of acl_profiler_external_memory
+   acl_profiler_external_memory
+   #(
+      .BURSTCOUNT_WIDTH(5)
+   )
+   mem_profiler__bank0_port0_kernel0
+   (
+      .clk(clock),
+      .resetn(resetn),
+      .burstcount_in(avm_memgmem0_port_0_0_rw_burstcount),
+      .readdatavalid_in(avm_memgmem0_port_0_0_rw_readdatavalid),
+      .write_in(avm_memgmem0_port_0_0_rw_write),
+      .read_in(avm_memgmem0_port_0_0_rw_read),
+      .waitrequest_in(avm_memgmem0_port_0_0_rw_waitrequest),
+      .read_count_enable_out(profile_extmem_vectorAdd_function_bank0_port0_top_read_data_inc_en),
+      .write_count_enable_out(profile_extmem_vectorAdd_function_bank0_port0_top_write_data_inc_en),
+      .read_burst_count_enable_out(profile_extmem_vectorAdd_function_bank0_port0_top_read_burst_count_en),
+      .write_burst_count_enable_out(profile_extmem_vectorAdd_function_bank0_port0_top_write_burst_count_en),
+      .read_burst_count_dup_enable_out(),
+      .write_burst_count_dup_enable_out(),
+      .read_burst_count_value_out(),
+      .write_burst_count_value_out()
+   );
+
 endmodule
 
 /////////////////////////////////////////////////////////////////
@@ -537,8 +569,20 @@ module vectorAdd_top_wrapper
    input logic avm_local_bb1_st_c0_exe1_inst0_waitrequest,
    input logic [255:0] avm_local_bb1_st_c0_exe1_inst0_readdata,
    input logic avm_local_bb1_st_c0_exe1_inst0_readdatavalid,
-   input logic avm_local_bb1_st_c0_exe1_inst0_writeack
+   input logic avm_local_bb1_st_c0_exe1_inst0_writeack,
+   input logic profile_extmem_vectorAdd_function_bank0_port0_wrap_read_data_inc_en,
+   input logic profile_extmem_vectorAdd_function_bank0_port0_wrap_write_data_inc_en,
+   input logic profile_extmem_vectorAdd_function_bank0_port0_wrap_read_burst_count_en,
+   input logic profile_extmem_vectorAdd_function_bank0_port0_wrap_write_burst_count_en
 );
+   logic profile_extmem_vectorAdd_function_bank0_port0_top_side_read_data_inc_en;
+   logic profile_extmem_vectorAdd_function_bank0_port0_kern_side_read_data_inc_en;
+   logic profile_extmem_vectorAdd_function_bank0_port0_top_side_write_data_inc_en;
+   logic profile_extmem_vectorAdd_function_bank0_port0_kern_side_write_data_inc_en;
+   logic profile_extmem_vectorAdd_function_bank0_port0_top_side_read_burst_count_en;
+   logic profile_extmem_vectorAdd_function_bank0_port0_kern_side_read_burst_count_en;
+   logic profile_extmem_vectorAdd_function_bank0_port0_top_side_write_burst_count_en;
+   logic profile_extmem_vectorAdd_function_bank0_port0_kern_side_write_burst_count_en;
    logic lmem_invalid_single_bit;
 
    // INST kernel of vectorAdd_function_wrapper
@@ -589,9 +633,21 @@ module vectorAdd_top_wrapper
       .avm_local_bb1_st_c0_exe1_inst0_waitrequest(avm_local_bb1_st_c0_exe1_inst0_waitrequest),
       .avm_local_bb1_st_c0_exe1_inst0_readdata(avm_local_bb1_st_c0_exe1_inst0_readdata),
       .avm_local_bb1_st_c0_exe1_inst0_readdatavalid(avm_local_bb1_st_c0_exe1_inst0_readdatavalid),
-      .avm_local_bb1_st_c0_exe1_inst0_writeack(avm_local_bb1_st_c0_exe1_inst0_writeack)
+      .avm_local_bb1_st_c0_exe1_inst0_writeack(avm_local_bb1_st_c0_exe1_inst0_writeack),
+      .profile_extmem_vectorAdd_function_bank0_port0_read_data_inc_en(profile_extmem_vectorAdd_function_bank0_port0_kern_side_read_data_inc_en),
+      .profile_extmem_vectorAdd_function_bank0_port0_write_data_inc_en(profile_extmem_vectorAdd_function_bank0_port0_kern_side_write_data_inc_en),
+      .profile_extmem_vectorAdd_function_bank0_port0_read_burst_count_en(profile_extmem_vectorAdd_function_bank0_port0_kern_side_read_burst_count_en),
+      .profile_extmem_vectorAdd_function_bank0_port0_write_burst_count_en(profile_extmem_vectorAdd_function_bank0_port0_kern_side_write_burst_count_en)
    );
 
+   assign profile_extmem_vectorAdd_function_bank0_port0_top_side_read_data_inc_en = profile_extmem_vectorAdd_function_bank0_port0_wrap_read_data_inc_en;
+   assign profile_extmem_vectorAdd_function_bank0_port0_kern_side_read_data_inc_en = profile_extmem_vectorAdd_function_bank0_port0_top_side_read_data_inc_en;
+   assign profile_extmem_vectorAdd_function_bank0_port0_top_side_write_data_inc_en = profile_extmem_vectorAdd_function_bank0_port0_wrap_write_data_inc_en;
+   assign profile_extmem_vectorAdd_function_bank0_port0_kern_side_write_data_inc_en = profile_extmem_vectorAdd_function_bank0_port0_top_side_write_data_inc_en;
+   assign profile_extmem_vectorAdd_function_bank0_port0_top_side_read_burst_count_en = profile_extmem_vectorAdd_function_bank0_port0_wrap_read_burst_count_en;
+   assign profile_extmem_vectorAdd_function_bank0_port0_kern_side_read_burst_count_en = profile_extmem_vectorAdd_function_bank0_port0_top_side_read_burst_count_en;
+   assign profile_extmem_vectorAdd_function_bank0_port0_top_side_write_burst_count_en = profile_extmem_vectorAdd_function_bank0_port0_wrap_write_burst_count_en;
+   assign profile_extmem_vectorAdd_function_bank0_port0_kern_side_write_burst_count_en = profile_extmem_vectorAdd_function_bank0_port0_top_side_write_burst_count_en;
    assign lmem_invalid_single_bit = 'b0;
 endmodule
 
